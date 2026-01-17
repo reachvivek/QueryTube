@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Video {
+  id                String   @id @default(uuid())
+  youtubeUrl        String?
+  youtubeId         String?  @unique
+  title             String
+  description       String?
+  duration          Int // in seconds
+  durationFormatted String
+  thumbnail         String?
+  uploader          String?
+  language          String   @default("en")
+
+  // Processing status
+  status            String   @default("pending") // pending, processing, completed, failed
+  errorMessage      String?
+
+  // Transcript source
+  transcriptSource  String?  // youtube-captions, whisper-api, uploaded-file
+  transcript        String?  // Full transcript text
+  summary           String?  // AI-generated summary of video content
+
+  // File info
+  audioFilePath     String?
+  audioFileSize     Int?     // in bytes
+
+  // Timestamps
+  uploadedAt        DateTime @default(now())
+  processedAt       DateTime?
+
+  // Relations
+  chunks            Chunk[]
+  analytics         Analytics[]
+
+  @@index([status])
+  @@index([youtubeId])
+}
+
+model Chunk {
+  id          String   @id @default(uuid())
+  videoId     String
+  video       Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  chunkIndex  Int
+  text        String
+  startTime   Int      // in seconds
+  endTime     Int      // in seconds
+  timestamp   String   // formatted timestamp (e.g., "00:12:34")
+
+  // Vector database references
+  vectorId           String?  @unique  // Pinecone vector ID
+  embeddingProvider  String?  // mistral, openai - tracks which provider generated the embedding
+
+  createdAt   DateTime @default(now())
+
+  @@index([videoId])
+  @@index([vectorId])
+  @@unique([videoId, chunkIndex])
+}
+
+model Analytics {
+  id           String   @id @default(uuid())
+  videoId      String
+  video        Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  question     String
+  answer       String
+  responseTime Float    // in seconds
+
+  // AI provider tracking
+  provider     String   // groq, openai, claude - which provider handled the Q&A
+  model        String   // llama-3.3-70b-versatile, gpt-4o-mini, etc.
+
+  // Retrieved chunks info
+  chunksUsed   Int      @default(0)
+
+  timestamp    DateTime @default(now())
+
+  @@index([videoId])
+  @@index([timestamp])
+  @@index([provider])
+}
