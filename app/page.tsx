@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/dashboard-layout";
+import PageHeader from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +28,7 @@ import {
   CheckCircle2,
   Loader2,
   AlertCircle,
+  LayoutDashboard,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -242,32 +245,22 @@ export default function Dashboard() {
     }
   };
 
+  const router = useRouter();
+
   return (
     <DashboardLayout language={language} onLanguageChange={setLanguage}>
-      <div className="p-8">
-        {/* Header - organized with proper spacing for language switcher */}
-        <div className="mb-8">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h1 className="text-3xl font-semibold text-black">
-                {t.overview}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Manage your educational video knowledge base
-              </p>
-            </div>
-            {/* Right side with spacing for language switcher above */}
-            <div className="flex flex-col items-end gap-2 pt-8">
-              <Link href="/new?clear=1">
-                <Button className="bg-black text-white hover:bg-gray-800">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t.newVideo}
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
+      <PageHeader
+        title={t.overview}
+        description="Manage your educational video knowledge base"
+        icon={LayoutDashboard}
+        action={{
+          label: t.newVideo,
+          onClick: () => router.push('/new?clear=1'),
+          icon: Plus,
+        }}
+      />
 
+      <div className="p-8 pt-0">
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="border-gray-200">
@@ -450,11 +443,13 @@ export default function Dashboard() {
               </TableBody>
             </Table>
 
-            <div className="mt-4 flex justify-center">
-              <Link href="/videos">
-                <Button variant="outline">{t.allVideos} →</Button>
-              </Link>
-            </div>
+            {videos.length > 0 && (
+              <div className="mt-4 flex justify-center">
+                <Link href="/videos">
+                  <Button variant="outline">{t.allVideos} →</Button>
+                </Link>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
