@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
        aiProvider === "claude" ? "claude-3-5-sonnet-20241022" :
        "gpt-4o-mini");
 
-    console.log(`[QA] Question: "${question}" | Video: ${videoId || "all"} | Provider: ${aiProvider} | Model: ${aiModel}`);
+    console.log(`[QA] Question: "${question}" | Video: ${videoId || "all"} | Provider: ${aiProvider} | Model: ${aiModel} | Language: ${language}`);
 
     // Step 1: Generate embedding for the question (use same provider as video embeddings)
     const embeddingProvider = process.env.DEFAULT_EMBEDDING_PROVIDER || "mistral";

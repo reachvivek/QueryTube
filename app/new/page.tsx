@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import DashboardLayout from "@/components/dashboard-layout";
 import PageHeader from "@/components/page-header";
+import { LoadingOverlay } from "@/components/loading-overlay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -128,9 +129,7 @@ function NewVideoContent() {
   const [transcriptImproved, setTranscriptImproved] = useState(false);
 
   // Step 4: Chat/QA state
-  const [systemPrompt, setSystemPrompt] = useState(
-    "Tu es un assistant éducatif qui répond aux questions sur le contenu vidéo en français."
-  );
+  const [systemPrompt, setSystemPrompt] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("groq");
   const [selectedModel, setSelectedModel] = useState("llama-3.3-70b-versatile");
   const [chatMessages, setChatMessages] = useState<Array<{ role: string; content: string }>>([]);
@@ -164,6 +163,20 @@ function NewVideoContent() {
 
   const closeModal = () => {
     setModalState((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  // Global loading state
+  const [globalLoading, setGlobalLoading] = useState({
+    isLoading: false,
+    message: "Processing..."
+  });
+
+  const showLoading = (message = "Processing...") => {
+    setGlobalLoading({ isLoading: true, message });
+  };
+
+  const hideLoading = () => {
+    setGlobalLoading({ isLoading: false, message: "" });
   };
 
   // Helper function to render message content with clickable timestamps
@@ -318,31 +331,41 @@ function NewVideoContent() {
             ),
             actionLabel: "Continue",
             onAction: () => {
-              // Restore state
-              if (session.currentStep) setCurrentStep(session.currentStep);
-              if (session.youtubeUrl) setYoutubeUrl(session.youtubeUrl);
-              if (session.videoInfo) setVideoInfo(session.videoInfo);
-              if (session.videoId) setVideoId(session.videoId);
-              if (session.processingStatus) setProcessingStatus(session.processingStatus);
-              if (session.transcriptData) setTranscriptData(session.transcriptData);
-              if (session.transcriptSource) setTranscriptSource(session.transcriptSource);
-
-              console.log(`[Session] Restored video ${lastVideoId}:`, session.currentStep);
-              setShowSessionBanner(true);
-              setSessionRestored(true);
               closeModal();
+              showLoading("Restoring your session...");
 
-              // Auto-hide banner after 8 seconds
               setTimeout(() => {
-                setShowSessionBanner(false);
-              }, 8000);
+                // Restore state
+                if (session.currentStep) setCurrentStep(session.currentStep);
+                if (session.youtubeUrl) setYoutubeUrl(session.youtubeUrl);
+                if (session.videoInfo) setVideoInfo(session.videoInfo);
+                if (session.videoId) setVideoId(session.videoId);
+                if (session.processingStatus) setProcessingStatus(session.processingStatus);
+                if (session.transcriptData) setTranscriptData(session.transcriptData);
+                if (session.transcriptSource) setTranscriptSource(session.transcriptSource);
+
+                console.log(`[Session] Restored video ${lastVideoId}:`, session.currentStep);
+                setShowSessionBanner(true);
+                setSessionRestored(true);
+                hideLoading();
+
+                // Auto-hide banner after 8 seconds
+                setTimeout(() => {
+                  setShowSessionBanner(false);
+                }, 8000);
+              }, 500);
             },
             onCancel: () => {
-              console.log("[Session] Starting fresh (user chose to start new)");
-              localStorage.removeItem("youtube-qa-last-video");
-              localStorage.removeItem(sessionKey);
-              setSessionRestored(true);
               closeModal();
+              showLoading("Starting fresh...");
+
+              setTimeout(() => {
+                console.log("[Session] Starting fresh (user chose to start new)");
+                localStorage.removeItem("youtube-qa-last-video");
+                localStorage.removeItem(sessionKey);
+                setSessionRestored(true);
+                hideLoading();
+              }, 300);
             },
             showCancel: true,
           });
@@ -1795,17 +1818,25 @@ function NewVideoContent() {
                               title: "Clear Chat History",
                               description: "Are you sure you want to clear all messages?",
                               actionLabel: "Clear",
-                              onAction: () => resolve(true),
+                              onAction: () => {
+                                closeModal();
+                                showLoading("Clearing chat history...");
+                                setTimeout(() => {
+                                  setChatMessages([]);
+                                  if (videoId) {
+                                    localStorage.removeItem(`chat-history-${videoId}`);
+                                  }
+                                  hideLoading();
+                                  resolve(true);
+                                }, 500);
+                              },
+                              onCancel: () => {
+                                closeModal();
+                                resolve(false);
+                              },
                               showCancel: true,
                             });
                           });
-
-                          if (confirmed) {
-                            setChatMessages([]);
-                            if (videoId) {
-                              localStorage.removeItem(`chat-history-${videoId}`);
-                            }
-                          }
                         }}
                         className="text-xs text-gray-500 hover:text-black"
                       >
@@ -2045,6 +2076,9 @@ function NewVideoContent() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Global Loading Overlay */}
+      <LoadingOverlay isLoading={globalLoading.isLoading} message={globalLoading.message} />
     </DashboardLayout>
   );
 }

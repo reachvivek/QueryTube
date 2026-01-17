@@ -1,8 +1,6 @@
 <div align="center">
 
-![QueryTube Logo](public/assets/logo_transparent.png)
-
-![QueryTube Cover](public/assets/cover.jpg)
+![QueryTube](public/assets/cover.jpg)
 
 </div>
 
