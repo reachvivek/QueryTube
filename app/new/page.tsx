@@ -415,6 +415,41 @@ function NewVideoContent() {
     }
   }, [currentStep, videoInfo, videoId, processingStatus, transcriptData, transcriptSource, sessionRestored]);
 
+  // Check if transcript already processed when navigating to knowledge step
+  useEffect(() => {
+    if (currentStep !== "knowledge" || !videoId) return;
+
+    const checkTranscriptStatus = async () => {
+      try {
+        const response = await fetch(`/api/videos/${videoId}`);
+        if (response.ok) {
+          const data = await response.json();
+          const video = data.video;
+
+          if (video && video.chunks && video.chunks.length > 0) {
+            // Check if chunks have vectorId (already processed)
+            const hasVectorIds = video.chunks.some((chunk: any) => chunk.vectorId);
+
+            if (hasVectorIds) {
+              console.log("[Knowledge Step] Transcript already processed with vectors");
+              setVectorsUploaded(true);
+              setVectorUploadStatus("completed");
+              setVectorUploadProgress(100);
+            } else {
+              console.log("[Knowledge Step] Transcript exists but not vectorized yet");
+              setVectorsUploaded(false);
+              setVectorUploadStatus("idle");
+            }
+          }
+        }
+      } catch (error) {
+        console.error("[Knowledge Step] Failed to check transcript status:", error);
+      }
+    };
+
+    checkTranscriptStatus();
+  }, [currentStep, videoId]);
+
   // Function to clear session for current video
   const clearSession = () => {
     try {
@@ -1524,8 +1559,8 @@ function NewVideoContent() {
                   <Alert className="bg-green-50 border-green-200">
                     <CheckCircle2 className="w-4 h-4 text-green-600" />
                     <AlertDescription className="text-green-900 text-sm">
-                      ✅ Successfully extracted transcript with {transcriptData.stats.totalChunks} segments!
-                      {transcriptData.language && ` Language: ${transcriptData.language.toUpperCase()}`}
+                      ✅ Successfully extracted transcript with {transcriptData?.stats?.totalChunks || transcriptData?.chunks?.length || 0} segments!
+                      {transcriptData?.language && ` Language: ${transcriptData.language.toUpperCase()}`}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -1663,7 +1698,7 @@ function NewVideoContent() {
                         </h4>
                         <p className="text-xs text-gray-600 mb-3">
                           Automatically fix any spelling or grammar errors in the transcript.
-                          Takes ~{Math.ceil(transcriptData.chunks.length / 10)} minute(s). (This costs extra)
+                          Takes ~{Math.ceil(transcriptData.chunks.length / 10)} minute(s). (More credits will be used)
                         </p>
                         <Button
                           onClick={improveTranscript}
@@ -1763,17 +1798,47 @@ function NewVideoContent() {
                       </AlertDescription>
                     </Alert>
 
-                    <div className="flex gap-3">
-                      <Button variant="outline" onClick={() => setCurrentStep("process")} className="flex-1">
-                        Back
-                      </Button>
+                    <div className="space-y-2">
                       <Button
-                        className="flex-1 bg-black text-white hover:bg-gray-800"
-                        onClick={() => setCurrentStep("configure")}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          showModal({
+                            type: "warning",
+                            title: "Reprocess Transcript?",
+                            description: "This will delete existing vectors and reprocess the transcript. This is useful if you want to use a different embedding model or if search quality is poor.",
+                            actionLabel: "Reprocess",
+                            onAction: () => {
+                              closeModal();
+                              showLoading("Reprocessing transcript...");
+                              setTimeout(() => {
+                                setVectorsUploaded(false);
+                                setVectorUploadStatus("idle");
+                                setVectorUploadProgress(0);
+                                hideLoading();
+                                toast.success("Ready to reprocess. Click 'Process Transcript for Q&A' button.");
+                              }, 500);
+                            },
+                            showCancel: true,
+                          });
+                        }}
+                        className="w-full text-xs"
                       >
-                        Try Asking Questions
-                        <ArrowRight className="w-4 h-4 ml-2" />
+                        Reprocess Transcript
                       </Button>
+
+                      <div className="flex gap-3">
+                        <Button variant="outline" onClick={() => setCurrentStep("process")} className="flex-1">
+                          Back
+                        </Button>
+                        <Button
+                          className="flex-1 bg-black text-white hover:bg-gray-800"
+                          onClick={() => setCurrentStep("configure")}
+                        >
+                          Try Asking Questions
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </div>
                     </div>
                   </>
                 )}

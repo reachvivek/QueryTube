@@ -95,7 +95,14 @@ export async function POST(request: NextRequest) {
 
     const queryResponse = await index.query(queryOptions);
 
+    console.log(`[QA] Found ${queryResponse.matches?.length || 0} matching chunks from Pinecone`);
+    if (queryResponse.matches && queryResponse.matches.length > 0) {
+      const textPreview = String(queryResponse.matches[0].metadata?.text || "").substring(0, 100);
+      console.log(`[QA] Top match score: ${queryResponse.matches[0].score}, text preview: "${textPreview}..."`);
+    }
+
     if (!queryResponse.matches || queryResponse.matches.length === 0) {
+      console.log("[QA] No matches found in Pinecone for this question");
       return NextResponse.json({
         success: true,
         answer: "I couldn't find any relevant information to answer this question.",
