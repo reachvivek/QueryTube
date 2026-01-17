@@ -56,6 +56,38 @@ export async function POST(request: NextRequest) {
 
     console.log(`[QA] Question: "${question}" | Video: ${videoId || "all"} | Provider: ${aiProvider} | Model: ${aiModel} | Language: ${language}`);
 
+    // Check if this is a broad summary question and if video summary exists
+    const isBroadQuestion = /what is this (video|about)|summary|summarize|main topic|overview|key points/i.test(question);
+
+    if (isBroadQuestion && videoId) {
+      console.log("[QA] Detected broad summary question - checking for video summary");
+
+      const video = await prisma.video.findUnique({
+        where: { id: videoId },
+        select: { summary: true, title: true },
+      });
+
+      if (video?.summary) {
+        console.log(`[QA] Using cached video summary: "${video.summary}"`);
+
+        // Return summary directly for broad questions
+        const answer = video.summary;
+        const responseTime = (Date.now() - startTime) / 1000;
+
+        return NextResponse.json({
+          success: true,
+          answer,
+          chunks: [],
+          responseTime,
+          model: "cached-summary",
+          provider: "database",
+          usedSummary: true,
+        });
+      } else {
+        console.log("[QA] No video summary found - will use semantic search");
+      }
+    }
+
     // Step 1: Generate embedding for the question (use same provider as video embeddings)
     const embeddingProvider = process.env.DEFAULT_EMBEDDING_PROVIDER || "mistral";
     console.log(`[QA] Generating question embedding with ${embeddingProvider}...`);

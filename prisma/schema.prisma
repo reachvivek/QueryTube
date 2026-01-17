@@ -40,6 +40,7 @@ model Video {
 
   // Relations
   chunks            Chunk[]
+  macroChunks       MacroChunk[]
   analytics         Analytics[]
 
   @@index([status])
@@ -57,11 +58,38 @@ model Chunk {
   endTime     Int      // in seconds
   timestamp   String   // formatted timestamp (e.g., "00:12:34")
 
-  // Vector database references
-  vectorId           String?  @unique  // Pinecone vector ID
-  embeddingProvider  String?  // mistral, openai - tracks which provider generated the embedding
+  // NOTE: Chunks are small segments (1-6s) for timestamp precision
+  // Legacy: vectorId kept for backward compatibility - prefer MacroChunk for new embeddings
+  vectorId           String?  @unique  // Pinecone vector ID (legacy)
+  embeddingProvider  String?  // mistral, openai (legacy)
 
   createdAt   DateTime @default(now())
+
+  @@index([videoId])
+  @@index([vectorId])
+  @@unique([videoId, chunkIndex])
+}
+
+model MacroChunk {
+  id                  String   @id @default(uuid())
+  videoId             String
+  video               Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  chunkIndex          Int      // index of this macro chunk
+  text                String   // combined text from multiple segments
+  startTime           Int      // in seconds
+  endTime             Int      // in seconds
+  timestamp           String   // formatted start timestamp
+
+  // References to original segments
+  segmentStartIndex   Int      // first segment index in this chunk
+  segmentEndIndex     Int      // last segment index in this chunk
+
+  // Vector database references
+  vectorId            String?  @unique  // Pinecone vector ID
+  embeddingProvider   String?  // mistral, openai
+
+  createdAt           DateTime @default(now())
 
   @@index([videoId])
   @@index([vectorId])

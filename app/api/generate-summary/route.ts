@@ -19,13 +19,13 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Generate Summary] Generating summary for video: ${videoId}`);
 
-    // Get video with chunks from database
+    // Get video with ALL chunks from database
     const video = await prisma.video.findUnique({
       where: { id: videoId },
       include: {
         chunks: {
           orderBy: { chunkIndex: 'asc' },
-          take: 30, // First 30 chunks for comprehensive overview
+          // Get ALL chunks for comprehensive summary
         },
       },
     });
@@ -56,42 +56,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[Generate Summary] Found ${video.chunks.length} chunks`);
+    console.log(`[Generate Summary] Found ${video.chunks.length} chunks, generating summary...`);
 
-    // Check if embeddings were created (vectorId is set in Step 3)
-    const chunksWithVectorId = video.chunks.filter(chunk => chunk.vectorId !== null);
-    const hasEmbeddings = chunksWithVectorId.length > 0;
+    // Generate summary from chunks - use strategic sampling for long videos
+    const totalChunks = video.chunks.length;
+    let sampleText = '';
 
-    console.log(`[Generate Summary] Chunks with embeddings: ${chunksWithVectorId.length}/${video.chunks.length}`);
-
-    if (!hasEmbeddings) {
-      console.log(`[Generate Summary] No embeddings found - vectorId is null on all chunks`);
-      return NextResponse.json(
-        { error: 'No embeddings found - please complete Step 3 (Vectorize) first' },
-        { status: 400 }
-      );
+    if (totalChunks <= 100) {
+      // Short video: use all chunks
+      sampleText = video.chunks.map((chunk) => chunk.text).join(' ');
+    } else {
+      // Long video: sample from beginning, middle, and end for representative summary
+      const beginning = video.chunks.slice(0, 50).map((chunk) => chunk.text).join(' ');
+      const middleStart = Math.floor(totalChunks / 2) - 25;
+      const middle = video.chunks.slice(middleStart, middleStart + 50).map((chunk) => chunk.text).join(' ');
+      const end = video.chunks.slice(-50).map((chunk) => chunk.text).join(' ');
+      sampleText = `${beginning} ... ${middle} ... ${end}`;
     }
 
-    // Generate summary from chunks
-    const sampleText = video.chunks
-      .map((chunk) => chunk.text)
-      .join(' ')
-      .slice(0, 2000); // Limit to 2000 chars for efficiency
+    // Limit total context to avoid token limits
+    const contextText = sampleText.slice(0, 8000);
 
     const completion = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [
         {
           role: 'system',
-          content: 'You are a helpful assistant. Provide a concise, engaging one-sentence summary (max 20 words) of what the video content is about.',
+          content: 'You are a helpful assistant. Analyze the video transcript and provide a comprehensive 2-3 sentence summary that captures the main topic, key points discussed, and overall theme.',
         },
         {
           role: 'user',
-          content: `Summarize this video content in one sentence: ${sampleText}`,
+          content: `Summarize what this video is about based on the transcript:\n\n${contextText}`,
         },
       ],
       temperature: 0.7,
-      max_tokens: 100,
+      max_tokens: 200,
     });
 
     const summary = completion.choices[0]?.message?.content?.trim() || '';
