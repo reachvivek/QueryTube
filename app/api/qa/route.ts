@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
       systemPrompt,
       model,
       provider,
-      topK = 5
+      topK = 5,
+      language = "en"
     } = await request.json();
 
     if (!question) {
@@ -67,14 +68,14 @@ export async function POST(request: NextRequest) {
         model: "mistral-embed",
         inputs: [question],
       });
-      questionEmbedding = embeddingResponse.data[0].embedding;
+      questionEmbedding = embeddingResponse.data[0].embedding || [];
     } else {
       // OpenAI (Paid - fallback)
       const embeddingResponse = await openai.embeddings.create({
         model: "text-embedding-3-small",
         input: question,
       });
-      questionEmbedding = embeddingResponse.data[0].embedding;
+      questionEmbedding = embeddingResponse.data[0].embedding || [];
     }
 
     // Step 2: Query Pinecone for relevant chunks
@@ -127,14 +128,29 @@ export async function POST(request: NextRequest) {
     });
 
     const context = chunks
-      .map((chunk, i) => `[${i + 1}] ${chunk.text}`)
+      .map((chunk, i) => `[${i + 1}] [${chunk.timestamp}] ${chunk.text}`)
       .join("\n\n");
 
     // Step 4: Generate answer using selected AI provider
+    const languageInstructions = {
+      en: "Respond in English.",
+      fr: "Répondez en français.",
+      hi: "हिंदी में जवाब दें।"
+    };
+
     const defaultSystemPrompt =
-      "You are a helpful AI assistant that answers questions based on video transcripts. " +
-      "Use the provided context to answer questions accurately. If you cannot find the answer " +
-      "in the context, say so. Always cite which part of the context you used.";
+      "You are a helpful, friendly AI assistant that answers questions about video content. " +
+      "Use the provided transcript context to give accurate, conversational answers. " +
+      "\n\nIMPORTANT INSTRUCTIONS:" +
+      "\n1. Be conversational and natural - respond like a friendly human would" +
+      "\n2. ALWAYS reference specific timestamps when mentioning video content (format: [MM:SS])" +
+      "\n3. If multiple relevant moments exist, mention all of them with timestamps" +
+      "\n4. If you cannot find the answer in the context, politely say so" +
+      "\n5. Use phrases like 'At [MM:SS], they discuss...' or 'Around [MM:SS], you'll find...'" +
+      `\n6. ${languageInstructions[language as keyof typeof languageInstructions] || languageInstructions.en} ` +
+      "Only use a different language if the user explicitly asks." +
+      "\n\nExample: 'At [12:34], Sam explains that AI will transform education. He also mentions this topic again at [45:12] when discussing...'";
+
 
     const userMessage = `Context from video transcript:\n\n${context}\n\nQuestion: ${question}`;
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout";
+import PageHeader from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -88,7 +89,7 @@ const mockStats = {
 };
 
 export default function KnowledgeBasePage() {
-  const [language, setLanguage] = useState<"en" | "fr">("en");
+  const [language, setLanguage] = useState<"en" | "fr" | "hi">("en");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedVideo, setSelectedVideo] = useState<string>("all");
 
@@ -133,6 +134,26 @@ export default function KnowledgeBasePage() {
       delete: "Supprimer",
       reindex: "Ré-indexer",
     },
+    hi: {
+      title: "ज्ञान आधार",
+      subtitle: "अपने वेक्टर डेटाबेस और सामग्री खंडों को प्रबंधित करें",
+      search: "ज्ञान आधार खोजें...",
+      filter: "फ़िल्टर",
+      refresh: "रीफ्रेश",
+      export: "निर्यात",
+      totalChunks: "कुल खंड",
+      totalVectors: "DB में वेक्टर",
+      storageUsed: "उपयोग किया गया भंडारण",
+      lastSync: "अंतिम सिंक",
+      allVideos: "सभी वीडियो",
+      videoTitle: "वीडियो",
+      chunkText: "सामग्री",
+      timestamp: "समय चिह्न",
+      actions: "क्रियाएँ",
+      viewDetails: "विवरण देखें",
+      delete: "हटाएं",
+      reindex: "पुनः अनुक्रमित करें",
+    },
   };
 
   const t = translations[language];
@@ -152,12 +173,13 @@ export default function KnowledgeBasePage() {
 
   return (
     <DashboardLayout language={language} onLanguageChange={setLanguage}>
-      <div className="p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-black">{t.title}</h1>
-          <p className="text-gray-600 mt-1">{t.subtitle}</p>
-        </div>
+      <PageHeader
+        title={t.title}
+        description={t.subtitle}
+        icon={Database}
+      />
+
+      <div className="p-4 sm:p-6 lg:p-8">
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

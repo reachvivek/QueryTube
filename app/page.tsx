@@ -68,7 +68,7 @@ interface DashboardVideo {
 }
 
 export default function Dashboard() {
-  const [language, setLanguage] = useState<"en" | "fr">("en");
+  const [language, setLanguage] = useState<"en" | "fr" | "hi">("en");
   const [stats, setStats] = useState<DashboardStats>({
     totalVideos: 0,
     totalChunks: 0,
@@ -187,7 +187,7 @@ export default function Dashboard() {
       chunks: "Chunks",
       uploaded: "Uploaded",
       actions: "Actions",
-      newVideo: "New Video",
+      newVideo: "Create Knowledge Base",
       viewDetails: "View Details",
       delete: "Delete",
       retry: "Retry",
@@ -208,10 +208,31 @@ export default function Dashboard() {
       chunks: "Fragments",
       uploaded: "Téléchargé",
       actions: "Actions",
-      newVideo: "Nouvelle Vidéo",
+      newVideo: "Créer une base",
       viewDetails: "Voir détails",
       delete: "Supprimer",
       retry: "Réessayer",
+    },
+    hi: {
+      overview: "अवलोकन",
+      videos: "वीडियो",
+      quickStats: "त्वरित आँकड़े",
+      totalVideos: "कुल वीडियो",
+      totalChunks: "ज्ञान खंड",
+      storage: "उपयोग किया गया भंडारण",
+      questions: "उत्तरित प्रश्न",
+      recentVideos: "हाल के वीडियो",
+      allVideos: "सभी वीडियो",
+      title: "शीर्षक",
+      status: "स्थिति",
+      progress: "प्रगति",
+      chunks: "खंड",
+      uploaded: "अपलोड किया गया",
+      actions: "क्रियाएँ",
+      newVideo: "ज्ञान आधार बनाएं",
+      viewDetails: "विवरण देखें",
+      delete: "हटाएं",
+      retry: "पुनः प्रयास करें",
     },
   };
 
@@ -253,27 +274,22 @@ export default function Dashboard() {
         title={t.overview}
         description="Manage your educational video knowledge base"
         icon={LayoutDashboard}
-        action={{
-          label: t.newVideo,
-          onClick: () => router.push('/new?clear=1'),
-          icon: Plus,
-        }}
       />
 
-      <div className="p-8 pt-0">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="border-gray-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t.totalVideos}</p>
-                  <p className="text-2xl font-semibold text-black mt-1">
+      <div className="p-4 sm:p-6 lg:p-8 pb-20 sm:pb-8">
+        {/* Quick Stats - Mobile Optimized */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <Card className="border-gray-200 hover:border-gray-300 transition-colors">
+            <CardContent className="p-4 sm:pt-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">{t.totalVideos}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-black">
                     {loading ? "..." : stats.totalVideos}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Video className="w-6 h-6 text-blue-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center self-end sm:self-auto">
+                  <Video className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
@@ -330,25 +346,34 @@ export default function Dashboard() {
 
         {/* Videos Table */}
         <Card className="border-gray-200">
-          <CardHeader>
-            <CardTitle className="text-black">{t.recentVideos}</CardTitle>
-            <CardDescription>
-              Monitor your video processing status and progress
-            </CardDescription>
+          <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
+            <div className="space-y-1.5">
+              <CardTitle className="text-black">{t.recentVideos}</CardTitle>
+              <CardDescription>
+                Monitor your video processing status and progress
+              </CardDescription>
+            </div>
+            <Link href="/new?clear=1">
+              <Button className="bg-black text-white hover:bg-gray-800">
+                <Plus className="w-4 h-4 mr-2" />
+                {t.newVideo}
+              </Button>
+            </Link>
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t.title}</TableHead>
-                  <TableHead>{t.status}</TableHead>
-                  <TableHead>{t.progress}</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead>{t.chunks}</TableHead>
-                  <TableHead>{t.uploaded}</TableHead>
-                  <TableHead className="text-right">{t.actions}</TableHead>
-                </TableRow>
-              </TableHeader>
+          <CardContent className="p-0 sm:p-6">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[200px]">{t.title}</TableHead>
+                    <TableHead className="min-w-[100px]">{t.status}</TableHead>
+                    <TableHead className="hidden sm:table-cell min-w-[120px]">{t.progress}</TableHead>
+                    <TableHead className="hidden md:table-cell">Duration</TableHead>
+                    <TableHead className="hidden lg:table-cell">{t.chunks}</TableHead>
+                    <TableHead className="hidden lg:table-cell">{t.uploaded}</TableHead>
+                    <TableHead className="text-right min-w-[80px]">{t.actions}</TableHead>
+                  </TableRow>
+                </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
@@ -442,6 +467,7 @@ export default function Dashboard() {
                 )}
               </TableBody>
             </Table>
+            </div>
 
             {videos.length > 0 && (
               <div className="mt-4 flex justify-center">

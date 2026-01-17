@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout";
+import PageHeader from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -115,7 +116,7 @@ const mockQuestionLogs = [
 ];
 
 export default function LogsPage() {
-  const [language, setLanguage] = useState<"en" | "fr">("en");
+  const [language, setLanguage] = useState<"en" | "fr" | "hi">("en");
   const [searchTerm, setSearchTerm] = useState("");
 
   const translations = {
@@ -150,6 +151,22 @@ export default function LogsPage() {
       answer: "Réponse",
       responseTime: "Temps de réponse",
       chunks: "Fragments",
+    },
+    hi: {
+      title: "गतिविधि लॉग",
+      subtitle: "सिस्टम गतिविधि की निगरानी करें और समस्याओं का समाधान करें",
+      searchPlaceholder: "लॉग खोजें...",
+      export: "निर्यात",
+      systemLogs: "सिस्टम लॉग",
+      questionLogs: "प्रश्न लॉग",
+      timestamp: "समय चिह्न",
+      level: "स्तर",
+      action: "क्रिया",
+      message: "संदेश",
+      question: "प्रश्न",
+      answer: "उत्तर",
+      responseTime: "प्रतिक्रिया समय",
+      chunks: "खंड",
     },
   };
 
@@ -191,12 +208,13 @@ export default function LogsPage() {
 
   return (
     <DashboardLayout language={language} onLanguageChange={setLanguage}>
-      <div className="p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-black">{t.title}</h1>
-          <p className="text-gray-600 mt-1">{t.subtitle}</p>
-        </div>
+      <PageHeader
+        title={t.title}
+        description={t.subtitle}
+        icon={FileText}
+      />
+
+      <div className="p-4 sm:p-6 lg:p-8">
 
         {/* Search and Export */}
         <div className="flex items-center gap-4 mb-6">

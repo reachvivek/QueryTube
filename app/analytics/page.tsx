@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout";
+import PageHeader from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -78,7 +79,7 @@ const mockAnalytics = {
 };
 
 export default function AnalyticsPage() {
-  const [language, setLanguage] = useState<"en" | "fr">("en");
+  const [language, setLanguage] = useState<"en" | "fr" | "hi">("en");
 
   const translations = {
     en: {
@@ -113,18 +114,35 @@ export default function AnalyticsPage() {
       question: "Question",
       asked: "Fois demandée",
     },
+    hi: {
+      title: "विश्लेषण",
+      subtitle: "उपयोग और प्रदर्शन मेट्रिक्स ट्रैक करें",
+      totalQuestions: "कुल प्रश्न",
+      avgResponse: "औसत प्रतिक्रिया समय",
+      successRate: "सफलता दर",
+      popularVideos: "सबसे लोकप्रिय वीडियो",
+      popularQuestions: "अक्सर पूछे जाने वाले प्रश्न",
+      weeklyActivity: "साप्ताहिक गतिविधि",
+      video: "वीडियो",
+      questions: "प्रश्न",
+      rating: "रेटिंग",
+      views: "दृश्य",
+      question: "प्रश्न",
+      asked: "बार पूछा गया",
+    },
   };
 
   const t = translations[language];
 
   return (
     <DashboardLayout language={language} onLanguageChange={setLanguage}>
-      <div className="p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-black">{t.title}</h1>
-          <p className="text-gray-600 mt-1">{t.subtitle}</p>
-        </div>
+      <PageHeader
+        title={t.title}
+        description={t.subtitle}
+        icon={BarChart3}
+      />
+
+      <div className="p-4 sm:p-6 lg:p-8">
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

@@ -24,7 +24,7 @@ export default function PageHeader({
   action,
 }: PageHeaderProps) {
   return (
-    <div className="bg-white border-b border-gray-200 -mx-8 -mt-8 px-8 pt-6 pb-6 mb-8">
+    <div className="bg-white border-b border-gray-200 px-4 sm:px-8 py-6">
       {/* Back Link */}
       {backLink && backText && (
         <Link
@@ -37,7 +37,7 @@ export default function PageHeader({
       )}
 
       {/* Title Section */}
-      <div className="flex items-start justify-between gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pr-24 sm:pr-32">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {Icon && (
             <div className="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
@@ -45,7 +45,7 @@ export default function PageHeader({
             </div>
           )}
           <div className="min-w-0">
-            <h1 className="text-3xl font-bold text-black tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black tracking-tight">
               {title}
             </h1>
             {description && (
@@ -60,7 +60,7 @@ export default function PageHeader({
         {action && (
           <Button
             onClick={action.onClick}
-            className="bg-black text-white hover:bg-gray-800 flex-shrink-0"
+            className="bg-black text-white hover:bg-gray-800 flex-shrink-0 w-full sm:w-auto"
           >
             {action.icon && <action.icon className="w-4 h-4 mr-2" />}
             {action.label}

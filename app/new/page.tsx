@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import DashboardLayout from "@/components/dashboard-layout";
 import PageHeader from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -30,6 +32,7 @@ import {
   Loader2,
   Code,
   ArrowRight,
+  ArrowLeft,
   AlertCircle,
   Video,
   Clock,
@@ -45,6 +48,7 @@ type Step = "upload" | "process" | "knowledge" | "configure" | "deploy";
 
 interface VideoInfo {
   id: string;
+  videoId?: string;
   title: string;
   duration: number;
   durationFormatted: string;
@@ -58,24 +62,45 @@ interface VideoInfo {
 
 const translations = {
   en: {
-    newVideo: "New Video",
-    newVideoDesc: "Process a YouTube video and create an AI-powered Q&A agent",
-    backToDashboard: "Back to Dashboard",
-    steps: ["Upload", "Process", "Vectorize", "Configure", "Deploy"],
+    newVideo: "Create Knowledge Base",
+    newVideoDesc: "Turn a video into a searchable, AI-powered knowledge base",
+    steps: ["Upload", "Analyze", "Customize", "Ready", "Share"],
   },
   fr: {
-    newVideo: "Nouvelle Vidéo",
-    newVideoDesc: "Traitez une vidéo YouTube et créez un agent Q&A alimenté par l'IA",
-    backToDashboard: "Retour au tableau de bord",
-    steps: ["Télécharger", "Traiter", "Vectoriser", "Configurer", "Déployer"],
+    newVideo: "Créer une base de connaissances",
+    newVideoDesc: "Transformez une vidéo en base de connaissances IA consultable",
+    steps: ["Télécharger", "Analyser", "Personnaliser", "Prêt", "Partager"],
+  },
+  hi: {
+    newVideo: "ज्ञान आधार बनाएं",
+    newVideoDesc: "वीडियो को खोजने योग्य AI ज्ञान आधार में बदलें",
+    steps: ["अपलोड", "विश्लेषण", "अनुकूलन", "तैयार", "साझा करें"],
   },
 };
 
-export default function NewVideoPage() {
+function NewVideoContent() {
   const searchParams = useSearchParams();
   const editVideoId = searchParams?.get("videoId");
 
-  const [language, setLanguage] = useState<"en" | "fr">("en");
+  // Initialize language from localStorage or default to English
+  const [language, setLanguage] = useState<"en" | "fr" | "hi">(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('querytube-language');
+      const lang = (saved as "en" | "fr" | "hi") || "en";
+      console.log("[Language] Initialized:", lang, saved ? `(from localStorage)` : `(default)`);
+      return lang;
+    }
+    return "en";
+  });
+
+  // Save language preference whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('querytube-language', language);
+      console.log("[Language] Changed to:", language);
+    }
+  }, [language]);
+
   const [currentStep, setCurrentStep] = useState<Step>("upload");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [isValidating, setIsValidating] = useState(false);
@@ -114,6 +139,7 @@ export default function NewVideoPage() {
 
   // Chat ref for auto-scroll
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const questionInputRef = useRef<HTMLInputElement>(null);
 
   // Modal state
   const [modalState, setModalState] = useState<{
@@ -124,6 +150,7 @@ export default function NewVideoPage() {
     content?: React.ReactNode;
     actionLabel?: string;
     onAction?: () => void;
+    onCancel?: () => void;
     showCancel?: boolean;
   }>({
     isOpen: false,
@@ -137,6 +164,43 @@ export default function NewVideoPage() {
 
   const closeModal = () => {
     setModalState((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  // Helper function to render message content with clickable timestamps
+  const renderMessageWithTimestamps = (content: string, role: string) => {
+    // Regex to match timestamps like 12:34 or 1:23:45
+    const timestampRegex = /(\d{1,2}:\d{2}(?::\d{2})?)/g;
+    const parts = content.split(timestampRegex);
+
+    return parts.map((part, index) => {
+      // Check if this part is a timestamp
+      if (part.match(timestampRegex) && videoInfo?.videoId) {
+        const timeInSeconds = part.split(':').reverse().reduce((acc, time, i) => acc + parseInt(time) * Math.pow(60, i), 0);
+        const youtubeUrl = `https://www.youtube.com/watch?v=${videoInfo.videoId}&t=${timeInSeconds}s`;
+
+        return (
+          <a
+            key={index}
+            href={youtubeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium mx-1 ${
+              role === 'user'
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+            }`}
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(youtubeUrl, '_blank');
+              toast.success(`Opened video at ${part}`);
+            }}
+          >
+            ⏱ {part}
+          </a>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
   };
 
   const t = translations[language];
@@ -230,17 +294,6 @@ export default function NewVideoPage() {
   useEffect(() => {
     if (editVideoId) return; // Don't restore from localStorage in edit mode
 
-    // Check if user explicitly wants to start fresh
-    const urlParams = new URLSearchParams(window.location.search);
-    const clearSession = urlParams.get('clear') === '1';
-
-    if (clearSession) {
-      console.log("[Session] Starting fresh (user clicked New Video)");
-      localStorage.removeItem("youtube-qa-last-video");
-      setSessionRestored(true);
-      return;
-    }
-
     try {
       // Get the last active video ID
       const lastVideoId = localStorage.getItem("youtube-qa-last-video");
@@ -253,22 +306,49 @@ export default function NewVideoPage() {
         if (savedSession) {
           const session = JSON.parse(savedSession);
 
-          // Restore state
-          if (session.currentStep) setCurrentStep(session.currentStep);
-          if (session.youtubeUrl) setYoutubeUrl(session.youtubeUrl);
-          if (session.videoInfo) setVideoInfo(session.videoInfo);
-          if (session.videoId) setVideoId(session.videoId);
-          if (session.processingStatus) setProcessingStatus(session.processingStatus);
-          if (session.transcriptData) setTranscriptData(session.transcriptData);
-          if (session.transcriptSource) setTranscriptSource(session.transcriptSource);
+          // Ask user if they want to continue or start fresh
+          showModal({
+            type: "info",
+            title: "Resume Your Work?",
+            description: `You have an incomplete knowledge base for "${session.videoInfo?.title || 'your video'}".`,
+            content: (
+              <div className="text-sm space-y-2">
+                <p>Would you like to continue where you left off, or start a new one?</p>
+              </div>
+            ),
+            actionLabel: "Continue",
+            onAction: () => {
+              // Restore state
+              if (session.currentStep) setCurrentStep(session.currentStep);
+              if (session.youtubeUrl) setYoutubeUrl(session.youtubeUrl);
+              if (session.videoInfo) setVideoInfo(session.videoInfo);
+              if (session.videoId) setVideoId(session.videoId);
+              if (session.processingStatus) setProcessingStatus(session.processingStatus);
+              if (session.transcriptData) setTranscriptData(session.transcriptData);
+              if (session.transcriptSource) setTranscriptSource(session.transcriptSource);
 
-          console.log(`[Session] Restored video ${lastVideoId}:`, session.currentStep);
-          setShowSessionBanner(true);
+              console.log(`[Session] Restored video ${lastVideoId}:`, session.currentStep);
+              setShowSessionBanner(true);
+              setSessionRestored(true);
+              closeModal();
 
-          // Auto-hide banner after 8 seconds
-          setTimeout(() => {
-            setShowSessionBanner(false);
-          }, 8000);
+              // Auto-hide banner after 8 seconds
+              setTimeout(() => {
+                setShowSessionBanner(false);
+              }, 8000);
+            },
+            onCancel: () => {
+              console.log("[Session] Starting fresh (user chose to start new)");
+              localStorage.removeItem("youtube-qa-last-video");
+              localStorage.removeItem(sessionKey);
+              setSessionRestored(true);
+              closeModal();
+            },
+            showCancel: true,
+          });
+
+          // Don't set sessionRestored yet - wait for user choice
+          return;
         } else {
           console.log(`[Session] No saved session found for video ${lastVideoId}`);
         }
@@ -409,7 +489,7 @@ export default function NewVideoPage() {
           durationFormatted: videoInfo.durationFormatted,
           thumbnail: videoInfo.thumbnail,
           uploader: videoInfo.uploader,
-          language: "fr",
+          language: "en", // Default to English, will be updated after transcript is processed
         }),
       });
 
@@ -671,7 +751,7 @@ export default function NewVideoPage() {
     // Show confirmation modal
     const confirmed = await new Promise<boolean>((resolve) => {
       showModal({
-        type: "confirm",
+        type: "warning",
         title: "Improve Transcript Quality",
         description: "Fix grammar, spelling, and punctuation errors in the transcript.",
         content: (
@@ -681,8 +761,9 @@ export default function NewVideoPage() {
             <p className="text-orange-600 mt-3">This will incur additional processing costs.</p>
           </div>
         ),
-        onConfirm: () => resolve(true),
-        onCancel: () => resolve(false),
+        actionLabel: "Continue",
+        onAction: () => resolve(true),
+        showCancel: true,
       });
     });
 
@@ -842,7 +923,7 @@ export default function NewVideoPage() {
           metadata: {
             title: videoInfo.title,
             youtubeUrl: youtubeUrl,
-            language: transcriptData.language || "fr",
+            language: transcriptData.language || "en",
             uploader: videoInfo.uploader,
           },
         }),
@@ -927,6 +1008,7 @@ export default function NewVideoPage() {
           systemPrompt,
           model: selectedModel,
           provider: selectedProvider,
+          language,
         }),
       });
 
@@ -1058,18 +1140,26 @@ export default function NewVideoPage() {
     localStorage.setItem(`chat-history-${videoId}`, JSON.stringify(chatMessages));
   }, [chatMessages, videoId]);
 
+  // Auto-focus question input when on configure step
+  useEffect(() => {
+    if (currentStep === "configure" && questionInputRef.current) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        questionInputRef.current?.focus();
+      }, 100);
+    }
+  }, [currentStep]);
+
   return (
     <DashboardLayout language={language} onLanguageChange={setLanguage}>
-      <div className="p-8">
-        {/* Page Header */}
-        <PageHeader
-          title={t.newVideo}
-          description={t.newVideoDesc}
-          icon={Upload}
-          backLink="/"
-          backText={t.backToDashboard}
-        />
+      {/* Page Header */}
+      <PageHeader
+        title={t.newVideo}
+        description={t.newVideoDesc}
+        icon={Upload}
+      />
 
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Session Info & Reset */}
         {showSessionBanner && currentStep !== "upload" && videoInfo && (
           <Alert className="mb-6 bg-blue-50 border-blue-200 relative">
@@ -1290,11 +1380,16 @@ export default function NewVideoPage() {
                       </>
                     ) : (
                       <>
-                        Continue to Process
+                        Make Video Searchable
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </>
                     )}
                   </Button>
+                  {canProceed && !isValidating && (
+                    <p className="text-xs text-gray-500 text-center mt-2">
+                      No signup required • Your video stays private • Takes ~2 minutes
+                    </p>
+                  )}
                   {!canProceed && youtubeUrl && !isValidating && (
                     <p className="text-xs text-gray-500 text-center mt-2">
                       Please enter a valid YouTube URL to continue
@@ -1407,7 +1502,7 @@ export default function NewVideoPage() {
                     <CheckCircle2 className="w-4 h-4 text-green-600" />
                     <AlertDescription className="text-green-900 text-sm">
                       ✅ Successfully extracted transcript with {transcriptData.stats.totalChunks} segments!
-                      Language: {transcriptData.language?.toUpperCase() || "FR"}
+                      {transcriptData.language && ` Language: ${transcriptData.language.toUpperCase()}`}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -1696,11 +1791,12 @@ export default function NewVideoPage() {
                         onClick={async () => {
                           const confirmed = await new Promise<boolean>((resolve) => {
                             showModal({
-                              type: "confirm",
+                              type: "warning",
                               title: "Clear Chat History",
                               description: "Are you sure you want to clear all messages?",
-                              onConfirm: () => resolve(true),
-                              onCancel: () => resolve(false),
+                              actionLabel: "Clear",
+                              onAction: () => resolve(true),
+                              showCancel: true,
                             });
                           });
 
@@ -1744,18 +1840,62 @@ export default function NewVideoPage() {
                                 ? 'bg-black text-white'
                                 : 'bg-white border border-gray-200'
                             }`}>
-                              <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                              <p className="text-sm whitespace-pre-wrap">
+                                {renderMessageWithTimestamps(msg.content, msg.role)}
+                              </p>
                             </div>
                           </div>
                         ))}
+
+                        {/* Typing Indicator */}
+                        {isAnswering && (
+                          <div className="flex justify-start">
+                            <div className="max-w-[80%] rounded-lg p-3 bg-white border border-gray-200">
+                              <div className="flex items-center gap-1">
+                                <div className="flex gap-1">
+                                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                </div>
+                                <span className="text-xs text-gray-500 ml-2">QueryTube is typing...</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
 
+                  {/* Suggested Questions */}
+                  {chatMessages.length === 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-gray-600">Try these questions:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          "What is this video about?",
+                          "What are the key takeaways?",
+                          "Summarize the main points"
+                        ].map((question, idx) => (
+                          <Button
+                            key={idx}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentQuestion(question)}
+                            className="text-xs hover:bg-gray-100"
+                            disabled={isAnswering}
+                          >
+                            {question}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Input */}
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Ask a question about the video..."
+                      ref={questionInputRef}
+                      placeholder="Ask anything about this video..."
                       value={currentQuestion}
                       onChange={(e) => setCurrentQuestion(e.target.value)}
                       onKeyPress={(e) => {
@@ -1765,12 +1905,14 @@ export default function NewVideoPage() {
                         }
                       }}
                       disabled={isAnswering}
-                      className="flex-1"
+                      className="flex-1 text-base"
+                      aria-label="Ask a question about the video"
                     />
                     <Button
                       onClick={handleAskQuestion}
                       disabled={!currentQuestion.trim() || isAnswering}
-                      className="bg-black text-white hover:bg-gray-800"
+                      className="bg-black text-white hover:bg-gray-800 shrink-0"
+                      aria-label={isAnswering ? "Sending question" : "Send question"}
                     >
                       {isAnswering ? (
                         <>
@@ -1867,10 +2009,16 @@ export default function NewVideoPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={closeModal}
+                onClick={() => {
+                  if (modalState.onCancel) {
+                    modalState.onCancel();
+                  } else {
+                    closeModal();
+                  }
+                }}
                 className="flex-1 sm:flex-1"
               >
-                Cancel
+                Start Fresh
               </Button>
             )}
             <Button
@@ -1898,5 +2046,20 @@ export default function NewVideoPage() {
         </DialogContent>
       </Dialog>
     </DashboardLayout>
+  );
+}
+
+export default function NewVideoPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-gray-400" />
+          <p className="text-sm text-gray-500">Loading...</p>
+        </div>
+      </div>
+    }>
+      <NewVideoContent />
+    </Suspense>
   );
 }

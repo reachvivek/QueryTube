@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout";
+import PageHeader from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
-  const [language, setLanguage] = useState<"en" | "fr">("en");
+  const [language, setLanguage] = useState<"en" | "fr" | "hi">("en");
   const [saved, setSaved] = useState(false);
 
   const translations = {
@@ -60,6 +61,24 @@ export default function SettingsPage() {
       chunkSize: "Taille de fragment par défaut (secondes)",
       overlap: "Chevauchement par défaut (secondes)",
     },
+    hi: {
+      title: "सेटिंग्स",
+      subtitle: "अपनी API कुंजी और प्राथमिकताएं कॉन्फ़िगर करें",
+      apiKeys: "API कुंजियाँ",
+      vectorDB: "वेक्टर डेटाबेस",
+      aiModel: "AI मॉडल",
+      general: "सामान्य",
+      save: "परिवर्तन सहेजें",
+      saved: "सेटिंग्स सफलतापूर्वक सहेजी गईं!",
+      openaiKey: "OpenAI API कुंजी",
+      pineconeKey: "Pinecone API कुंजी",
+      pineconeIndex: "Pinecone इंडेक्स नाम",
+      pineconeEnv: "Pinecone वातावरण",
+      defaultModel: "डिफ़ॉल्ट मॉडल",
+      systemPrompt: "डिफ़ॉल्ट सिस्टम प्रॉम्प्ट",
+      chunkSize: "डिफ़ॉल्ट खंड आकार (सेकंड)",
+      overlap: "डिफ़ॉल्ट ओवरलैप (सेकंड)",
+    },
   };
 
   const t = translations[language];
@@ -71,12 +90,13 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout language={language} onLanguageChange={setLanguage}>
-      <div className="p-8 max-w-4xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-black">{t.title}</h1>
-          <p className="text-gray-600 mt-1">{t.subtitle}</p>
-        </div>
+      <PageHeader
+        title={t.title}
+        description={t.subtitle}
+        icon={SettingsIcon}
+      />
+
+      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl">
 
         {/* Success Alert */}
         {saved && (
