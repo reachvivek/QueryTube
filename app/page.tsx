@@ -33,7 +33,7 @@ export default function LandingPage() {
       </section>
 
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center w-full">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-black text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
@@ -70,7 +70,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 sm:py-20 lg:py-24 bg-gray-50 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
@@ -176,7 +176,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
@@ -219,7 +219,7 @@ export default function LandingPage() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-16 sm:py-20 lg:py-24 bg-gray-50 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
@@ -335,7 +335,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl sm:text-5xl font-bold text-black mb-6">
             Stop Scrubbing. Start Asking.
