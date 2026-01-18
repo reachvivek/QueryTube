@@ -69,8 +69,12 @@ export async function downloadYouTubeAudio(
       fs.mkdirSync(outputPath, { recursive: true });
     }
 
-    // Initialize YouTube client
-    const youtube = await Innertube.create();
+    // Initialize YouTube client with cache to fix "No valid URL to decipher" error
+    // This is required as of January 2026 due to YouTube API changes
+    const youtube = await Innertube.create({
+      cache: undefined, // Disable caching to force fresh player retrieval
+      retrieve_player: true, // Force player retrieval
+    });
 
     // Extract video ID from URL
     const videoId = extractVideoId(youtubeUrl);
