@@ -216,10 +216,10 @@ export function AnimatedDemo() {
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-            className="w-full h-full rounded-sm sm:rounded"
+            className="w-full h-full rounded-xl sm:rounded-2xl"
           />
           {/* Video duration overlay */}
-          <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 bg-black/80 text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-md flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+          <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 bg-black/80 backdrop-blur-sm text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm shadow-lg">
             <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
             <span>{currentVideo.duration}</span>
           </div>
@@ -239,7 +239,7 @@ export function AnimatedDemo() {
             {/* Welcome message from AI */}
             {showWelcome && (
               <div className="flex justify-start">
-                <div className="max-w-[90%] bg-white border border-gray-200 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl rounded-tl-sm shadow-sm">
+                <div className="max-w-[90%] bg-white border border-gray-200 px-3 py-2.5 sm:px-4 sm:py-3 rounded-3xl rounded-tl-lg shadow-sm">
                   <p className="text-xs sm:text-sm text-gray-800 leading-relaxed">
                     {welcomeText}
                     {welcomeText.length < fullWelcome.length && (
@@ -252,105 +252,113 @@ export function AnimatedDemo() {
 
             {/* Question 1 */}
             {showQuestion1 && (
-              <div className="flex justify-end flex-col items-end gap-1">
-                {question1Text.length > 0 && question1Text.length < fullQuestion1.length && (
-                  <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-gray-100 rounded-full">
-                    <div className="flex gap-0.5 sm:gap-1">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                    <span className="text-[10px] sm:text-xs text-gray-600">Listening...</span>
-                  </div>
-                )}
-                <div className="max-w-[85%] bg-black text-white px-3 py-2 sm:px-4 sm:py-3 rounded-2xl rounded-tr-sm">
-                  <p className="text-xs sm:text-sm">
-                    {question1Text}
-                    {question1Text.length < fullQuestion1.length && (
-                      <span className="inline-block w-0.5 h-3 sm:h-4 bg-white ml-1 animate-pulse" />
+              <div className="flex justify-end">
+                <div className="max-w-[85%] bg-black text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-3xl rounded-tr-lg shadow-md">
+                  <div className="flex items-center gap-2">
+                    {question1Text.length > 0 && question1Text.length < fullQuestion1.length && (
+                      <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" />
                     )}
-                  </p>
+                    <p className="text-xs sm:text-sm leading-relaxed">
+                      {question1Text}
+                      {question1Text.length < fullQuestion1.length && (
+                        <span className="inline-block w-0.5 h-3 sm:h-4 bg-white ml-1 animate-pulse" />
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Answer 1 */}
             {showAnswer1 && (
-              <div className="flex justify-start flex-col items-start gap-1">
-                {answer1Text.length > 0 && answer1Text.length < fullAnswer1.length && (
-                  <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-blue-50 rounded-full">
-                    <div className="flex gap-0.5 sm:gap-1">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                    <span className="text-[10px] sm:text-xs text-blue-600">Speaking...</span>
-                  </div>
-                )}
-                <div className="max-w-[90%] bg-white border border-gray-200 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl rounded-tl-sm shadow-sm">
-                  <p className="text-xs sm:text-sm text-gray-800 leading-relaxed">
-                    {answer1Text}
-                    {answer1Text.length < fullAnswer1.length && (
-                      <span className="inline-block w-0.5 h-3 sm:h-4 bg-gray-800 ml-1 animate-pulse" />
+              <div className="flex justify-start">
+                <div className="max-w-[90%] bg-white border border-gray-200 px-3 py-2.5 sm:px-4 sm:py-3 rounded-3xl rounded-tl-lg shadow-sm">
+                  <div className="flex items-start gap-2">
+                    {answer1Text.length > 0 && answer1Text.length < fullAnswer1.length && (
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse mt-1.5" />
                     )}
-                  </p>
+                    <p className="text-xs sm:text-sm text-gray-800 leading-relaxed flex-1">
+                      {answer1Text.split(/(\[\d{2}:\d{2}(?:–|-)?\d{2}:\d{2}\])/g).map((part, i) => {
+                        if (part.match(/\[\d{2}:\d{2}/)) {
+                          return (
+                            <span
+                              key={i}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px] sm:text-xs font-medium hover:bg-blue-100 cursor-pointer transition-colors mx-0.5"
+                            >
+                              <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                              {part.replace(/[\[\]]/g, '')}
+                            </span>
+                          );
+                        }
+                        return part;
+                      })}
+                      {answer1Text.length < fullAnswer1.length && (
+                        <span className="inline-block w-0.5 h-3 sm:h-4 bg-gray-800 ml-1 animate-pulse" />
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Question 2 */}
             {showQuestion2 && (
-              <div className="flex justify-end flex-col items-end gap-1">
-                {question2Text.length > 0 && question2Text.length < fullQuestion2.length && (
-                  <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-gray-100 rounded-full">
-                    <div className="flex gap-0.5 sm:gap-1">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                    <span className="text-[10px] sm:text-xs text-gray-600">Listening...</span>
-                  </div>
-                )}
-                <div className="max-w-[85%] bg-black text-white px-3 py-2 sm:px-4 sm:py-3 rounded-2xl rounded-tr-sm">
-                  <p className="text-xs sm:text-sm">
-                    {question2Text}
-                    {question2Text.length < fullQuestion2.length && (
-                      <span className="inline-block w-0.5 h-3 sm:h-4 bg-white ml-1 animate-pulse" />
+              <div className="flex justify-end">
+                <div className="max-w-[85%] bg-black text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-3xl rounded-tr-lg shadow-md">
+                  <div className="flex items-center gap-2">
+                    {question2Text.length > 0 && question2Text.length < fullQuestion2.length && (
+                      <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" />
                     )}
-                  </p>
+                    <p className="text-xs sm:text-sm leading-relaxed">
+                      {question2Text}
+                      {question2Text.length < fullQuestion2.length && (
+                        <span className="inline-block w-0.5 h-3 sm:h-4 bg-white ml-1 animate-pulse" />
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Answer 2 */}
             {showAnswer2 && (
-              <div className="flex justify-start flex-col items-start gap-1">
-                {answer2Text.length > 0 && answer2Text.length < fullAnswer2.length && (
-                  <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-blue-50 rounded-full">
-                    <div className="flex gap-0.5 sm:gap-1">
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                    <span className="text-[10px] sm:text-xs text-blue-600">Speaking...</span>
-                  </div>
-                )}
-                <div className="max-w-[90%] bg-white border border-gray-200 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl rounded-tl-sm shadow-sm">
-                  <p className="text-xs sm:text-sm text-gray-800 leading-relaxed">
-                    {answer2Text}
-                    {answer2Text.length < fullAnswer2.length && (
-                      <span className="inline-block w-0.5 h-3 sm:h-4 bg-gray-800 ml-1 animate-pulse" />
+              <div className="flex justify-start">
+                <div className="max-w-[90%] bg-white border border-gray-200 px-3 py-2.5 sm:px-4 sm:py-3 rounded-3xl rounded-tl-lg shadow-sm">
+                  <div className="flex items-start gap-2">
+                    {answer2Text.length > 0 && answer2Text.length < fullAnswer2.length && (
+                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse mt-1.5" />
                     )}
-                  </p>
+                    <p className="text-xs sm:text-sm text-gray-800 leading-relaxed flex-1">
+                      {answer2Text.split(/(\[\d{2}:\d{2}(?:–|-)?\d{2}:\d{2}\])/g).map((part, i) => {
+                        if (part.match(/\[\d{2}:\d{2}/)) {
+                          return (
+                            <span
+                              key={i}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px] sm:text-xs font-medium hover:bg-blue-100 cursor-pointer transition-colors mx-0.5"
+                            >
+                              <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                              {part.replace(/[\[\]]/g, '')}
+                            </span>
+                          );
+                        }
+                        return part;
+                      })}
+                      {answer2Text.length < fullAnswer2.length && (
+                        <span className="inline-block w-0.5 h-3 sm:h-4 bg-gray-800 ml-1 animate-pulse" />
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Input area at bottom */}
-          <div className="border-t border-gray-200 p-2.5 sm:p-4 bg-white">
+          {/* Input area at bottom - with gradient glow */}
+          <div className="border-t border-gray-200 p-2.5 sm:p-4 bg-gradient-to-t from-blue-50/30 via-white to-white relative">
+            {/* Subtle glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-100/20 to-transparent pointer-events-none" />
             {/* Language and Voice Mode */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-3 gap-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-3 gap-2 relative z-10">
               <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                 <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-600">
                   <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -387,11 +395,11 @@ export function AnimatedDemo() {
               </div>
             )}
 
-            <div className="flex gap-1.5 sm:gap-2">
+            <div className="flex gap-1.5 sm:gap-2 relative z-10">
               <input
                 type="text"
-                placeholder={voiceMode ? "Voice mode active - or type here..." : "Ask anything about this video..."}
-                className={`flex-1 px-3 py-2 sm:px-4 sm:py-2.5 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent cursor-pointer transition-all ${
+                placeholder={voiceMode ? "Voice mode active - or type here..." : currentVideo.question1}
+                className={`flex-1 px-3 py-2.5 sm:px-4 sm:py-3 border rounded-2xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all shadow-sm hover:shadow-md ${
                   voiceMode ? 'border-gray-200 bg-gray-50 text-gray-500' : 'border-gray-300 bg-white'
                 }`}
                 readOnly
@@ -399,14 +407,14 @@ export function AnimatedDemo() {
               />
               <button
                 onClick={() => window.location.href = '/auth/signin'}
-                className={`px-4 py-2 sm:px-6 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
+                className={`px-4 py-2.5 sm:px-6 sm:py-3 rounded-2xl text-xs sm:text-sm font-medium transition-all cursor-pointer shadow-sm hover:shadow-md ${
                   voiceMode ? 'bg-gray-300 text-gray-600' : 'bg-black text-white hover:bg-gray-800'
                 }`}
               >
                 Ask
               </button>
             </div>
-            <p className="text-[10px] sm:text-xs text-gray-500 mt-1.5 sm:mt-2 text-center">
+            <p className="text-[10px] sm:text-xs text-gray-500 mt-1.5 sm:mt-2 text-center relative z-10">
               {voiceMode ? 'Voice mode active • Sign in to use voice features' : 'Sign in to ask your own questions'}
             </p>
           </div>
