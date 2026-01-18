@@ -9,7 +9,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, Home, Info, DollarSign, FileText, HelpCircle, Sparkles } from "lucide-react";
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -95,86 +95,130 @@ export function SiteHeader() {
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[340px] bg-white">
-              <div className="flex flex-col gap-2 mt-8">
-                {/* Navigation Links */}
-                <nav className="flex flex-col gap-1 mb-4">
-                  <Link
-                    href="/"
-                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
-                      isActive("/")
-                        ? "text-black bg-gray-100"
-                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    href="/about"
-                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
-                      isActive("/about")
-                        ? "text-black bg-gray-100"
-                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    About
-                  </Link>
-                  <Link
-                    href="/pricing"
-                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
-                      isActive("/pricing")
-                        ? "text-black bg-gray-100"
-                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Pricing
-                  </Link>
-                  <Link
-                    href="/docs"
-                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
-                      isActive("/docs")
-                        ? "text-black bg-gray-100"
-                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Docs
-                  </Link>
-                  <Link
-                    href="/faq"
-                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
-                      isActive("/faq")
-                        ? "text-black bg-gray-100"
-                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    FAQ
-                  </Link>
-                </nav>
+            <SheetContent side="right" className="w-[320px] bg-white p-0 flex flex-col">
+              {/* Brand Header */}
+              <div className="px-6 pt-8 pb-6 border-b border-gray-100">
+                <h2 className="text-2xl font-bold tracking-tight mb-1">
+                  <span className="text-black">Query</span>
+                  <span className="text-red-600">Tube</span>
+                </h2>
+                <p className="text-sm text-gray-600 leading-snug">
+                  Ask questions. Get timestamped answers.
+                </p>
+              </div>
 
-                {/* Divider */}
-                <div className="h-px bg-gray-200 my-3" />
+              {/* Scrollable Menu Content */}
+              <div className="flex-1 overflow-y-auto px-4 py-4">
+                {/* MAIN Section */}
+                <div className="mb-6">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">
+                    Main
+                  </p>
+                  <nav className="flex flex-col gap-1">
+                    <Link
+                      href="/"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all border-l-3 ${
+                        isActive("/")
+                          ? "text-black bg-gray-100 border-l-4 border-black font-medium"
+                          : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100 border-l-4 border-transparent"
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Home className="w-5 h-5 flex-shrink-0" />
+                      <span className="text-base">Home</span>
+                    </Link>
+                  </nav>
+                </div>
 
-                {/* CTA Buttons */}
-                <div className="flex flex-col gap-3 pt-2">
-                  <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
-                    <Button
-                      variant="outline"
-                      className="w-full h-12 border-gray-300 text-black hover:bg-gray-50 rounded-xl font-medium text-base"
+                {/* PRODUCT Section */}
+                <div className="mb-6">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">
+                    Product
+                  </p>
+                  <nav className="flex flex-col gap-1">
+                    <Link
+                      href="/about"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                        isActive("/about")
+                          ? "text-black bg-gray-100 border-l-4 border-black font-medium"
+                          : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100 border-l-4 border-transparent"
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
-                    <Button
-                      className="w-full h-12 bg-black text-white hover:bg-gray-800 rounded-xl font-medium text-base shadow-sm"
+                      <Info className="w-5 h-5 flex-shrink-0" />
+                      <span className="text-base">About</span>
+                    </Link>
+                    <Link
+                      href="/pricing"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                        isActive("/pricing")
+                          ? "text-black bg-gray-100 border-l-4 border-black font-medium"
+                          : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100 border-l-4 border-transparent"
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
-                      Get Started
-                    </Button>
+                      <DollarSign className="w-5 h-5 flex-shrink-0" />
+                      <span className="text-base">Pricing</span>
+                    </Link>
+                  </nav>
+                </div>
+
+                {/* RESOURCES Section */}
+                <div className="mb-6">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">
+                    Resources
+                  </p>
+                  <nav className="flex flex-col gap-1">
+                    <Link
+                      href="/docs"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                        isActive("/docs")
+                          ? "text-black bg-gray-100 border-l-4 border-black font-medium"
+                          : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100 border-l-4 border-transparent"
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <FileText className="w-5 h-5 flex-shrink-0" />
+                      <span className="text-base">Docs</span>
+                    </Link>
+                    <Link
+                      href="/faq"
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                        isActive("/faq")
+                          ? "text-black bg-gray-100 border-l-4 border-black font-medium"
+                          : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100 border-l-4 border-transparent"
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <HelpCircle className="w-5 h-5 flex-shrink-0" />
+                      <span className="text-base">FAQ</span>
+                    </Link>
+                  </nav>
+                </div>
+
+                {/* Trust Badge */}
+                <div className="flex items-center gap-2 px-3 py-3 bg-blue-50 rounded-lg mb-4">
+                  <Sparkles className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <p className="text-xs text-blue-900 font-medium leading-snug">
+                    Trusted for long-form video understanding
+                  </p>
+                </div>
+              </div>
+
+              {/* Sticky CTA Footer */}
+              <div className="border-t border-gray-100 p-4 bg-white">
+                <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full h-12 bg-black text-white hover:bg-gray-800 rounded-xl font-semibold text-base shadow-md mb-3">
+                    Get Started Free
+                  </Button>
+                </Link>
+                <div className="text-center">
+                  <Link
+                    href="/auth/signin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-sm text-gray-600 hover:text-black transition-colors"
+                  >
+                    Already have an account? <span className="font-medium underline">Sign in</span>
                   </Link>
                 </div>
               </div>
