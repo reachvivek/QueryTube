@@ -524,6 +524,7 @@ export default function Dashboard() {
             <Button
               variant="outline"
               onClick={() => setDeleteConfirm(null)}
+              disabled={deleting === deleteConfirm?.videoId}
             >
               Cancel
             </Button>
@@ -532,11 +533,34 @@ export default function Dashboard() {
               onClick={confirmDelete}
               disabled={deleting === deleteConfirm?.videoId}
             >
-              {deleting === deleteConfirm?.videoId ? "Deleting..." : "Delete"}
+              {deleting === deleteConfirm?.videoId ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Full-screen delete loader */}
+      {deleting && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 shadow-xl max-w-md">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="w-12 h-12 animate-spin text-red-600" />
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-black mb-2">Deleting Video...</h3>
+                <p className="text-sm text-gray-600">Removing video data and vector embeddings from Pinecone.</p>
+                <p className="text-xs text-gray-500 mt-2">This may take a few seconds.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
