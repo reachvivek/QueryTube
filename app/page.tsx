@@ -177,44 +177,89 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Mobile-only CTA - Early conversion opportunity */}
+      <section className="md:hidden py-8 px-4 bg-white">
+        <div className="max-w-md mx-auto text-center">
+          <Link href="/auth/signin">
+            <Button className="w-full h-14 bg-black text-white hover:bg-gray-800 rounded-xl text-base font-semibold shadow-lg">
+              Get Started Free
+            </Button>
+          </Link>
+          <p className="text-xs text-gray-500 mt-3">No credit card required</p>
+        </div>
+      </section>
+
       {/* How It Works */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-8 sm:py-12 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
-              Three Steps to Searchable Video
-            </h2>
+          {/* Mobile: Compact horizontal strip */}
+          <div className="md:hidden">
+            <h2 className="text-2xl font-bold text-black mb-6 text-center">How It Works</h2>
+            <div className="flex items-center justify-between gap-2 max-w-md mx-auto">
+              <div className="flex-1 text-center">
+                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-2">
+                  1
+                </div>
+                <p className="text-xs font-semibold text-black mb-1">Upload</p>
+                <p className="text-xs text-gray-600">Paste link</p>
+              </div>
+              <div className="text-gray-400 text-xl">→</div>
+              <div className="flex-1 text-center">
+                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-2">
+                  2
+                </div>
+                <p className="text-xs font-semibold text-black mb-1">Process</p>
+                <p className="text-xs text-gray-600">AI analyzes</p>
+              </div>
+              <div className="text-gray-400 text-xl">→</div>
+              <div className="flex-1 text-center">
+                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-2">
+                  3
+                </div>
+                <p className="text-xs font-semibold text-black mb-1">Ask</p>
+                <p className="text-xs text-gray-600">Get answers</p>
+              </div>
+            </div>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
-            <div className="text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
-                1
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Upload</h3>
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-                Paste a YouTube URL. We handle transcription, chunking, and embedding.
-              </p>
+          {/* Desktop: Full version */}
+          <div className="hidden md:block">
+            <div className="text-center mb-12 sm:mb-16">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
+                Three Steps to Searchable Video
+              </h2>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
-                2
+            <div className="grid sm:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
+              <div className="text-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
+                  1
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Upload</h3>
+                <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                  Paste a YouTube URL. We handle transcription, chunking, and embedding.
+                </p>
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Process</h3>
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-                AI analyzes the content and builds a searchable knowledge base.
-              </p>
-            </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
-                3
+              <div className="text-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
+                  2
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Process</h3>
+                <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                  AI analyzes the content and builds a searchable knowledge base.
+                </p>
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Ask</h3>
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-                Get instant, timestamped answers to any question about your video.
-              </p>
+
+              <div className="text-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
+                  3
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Ask</h3>
+                <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                  Get instant, timestamped answers to any question about your video.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -223,16 +268,25 @@ export default function LandingPage() {
       {/* Use Cases */}
       <section className="py-12 sm:py-16 lg:py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
-              Built for Learners
-            </h2>
-            <p className="text-lg sm:text-xl text-gray-600">
-              Perfect for education, research, and content analysis
+          {/* Mobile: Simple one-liner */}
+          <div className="md:hidden text-center py-6">
+            <p className="text-base text-gray-700 leading-relaxed max-w-lg mx-auto">
+              Built for <span className="font-semibold text-black">students</span>, <span className="font-semibold text-black">educators</span>, <span className="font-semibold text-black">researchers</span>, and <span className="font-semibold text-black">professionals</span> who need to unlock knowledge from long-form videos.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+          {/* Desktop: Full cards */}
+          <div className="hidden md:block">
+            <div className="text-center mb-12 sm:mb-16">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
+                Built for Learners
+              </h2>
+              <p className="text-lg sm:text-xl text-gray-600">
+                Perfect for education, research, and content analysis
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
             <Card className="border-gray-200 hover:border-blue-200 hover:shadow-lg transition-all h-full">
               <CardContent className="p-6 sm:p-7 flex flex-col h-full">
                 <div className="flex items-center gap-3 mb-5">
@@ -332,6 +386,7 @@ export default function LandingPage() {
                 </ul>
               </CardContent>
             </Card>
+            </div>
           </div>
         </div>
       </section>
