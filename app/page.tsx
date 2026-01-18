@@ -28,12 +28,12 @@ export default function LandingPage() {
       <SiteHeader />
 
       {/* Interactive Demo Section - Full Viewport */}
-      <section className="min-h-screen flex items-center relative">
+      <section className="flex items-center relative">
         <AnimatedDemo />
       </section>
 
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      <section className="min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center w-full">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-black text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
