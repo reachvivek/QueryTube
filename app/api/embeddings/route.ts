@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { Mistral } from "@mistralai/mistralai";
+import { validateArray, validateProvider } from "@/lib/validation";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -41,18 +42,38 @@ async function retryWithBackoff<T>(
 
 export async function POST(request: NextRequest) {
   try {
-    const { chunks, model, provider } = await request.json();
+    const body = await request.json();
 
-    if (!chunks || !Array.isArray(chunks) || chunks.length === 0) {
+    // Validate chunks array (max 5000 chunks to prevent DoS)
+    const chunksValidation = validateArray(body.chunks, 5000, "Invalid chunks array");
+    if (!chunksValidation.valid) {
       return NextResponse.json(
-        { error: "Invalid chunks array" },
+        { error: chunksValidation.error },
+        { status: 400 }
+      );
+    }
+    const chunks = chunksValidation.array!;
+
+    // Validate each chunk has text property
+    const invalidChunk = chunks.find((chunk: any) => {
+      if (typeof chunk === 'string') return false;
+      if (typeof chunk === 'object' && chunk.text) return false;
+      return true;
+    });
+
+    if (invalidChunk) {
+      return NextResponse.json(
+        { error: "Each chunk must be a string or have a 'text' property" },
         { status: 400 }
       );
     }
 
-    // Determine provider and model
-    const embeddingProvider = provider || process.env.DEFAULT_EMBEDDING_PROVIDER || "mistral";
-    const embeddingModel = model ||
+    // Validate provider
+    const embeddingProvider = validateProvider(body.provider, ["mistral", "openai"]) ||
+      process.env.DEFAULT_EMBEDDING_PROVIDER ||
+      "mistral";
+
+    const embeddingModel = body.model ||
       (embeddingProvider === "mistral" ? "mistral-embed" : "text-embedding-3-small");
 
     console.log(`[Embeddings] Generating embeddings for ${chunks.length} chunks using ${embeddingProvider}:${embeddingModel}`);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { validatePagination, validateString, validateNumber, validateLanguage } from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,8 +16,14 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status"); //  Filter by status
-    const limit = parseInt(searchParams.get("limit") || "50");
-    const offset = parseInt(searchParams.get("offset") || "0");
+
+    // Validate pagination parameters
+    const pagination = validatePagination(
+      searchParams.get("limit"),
+      searchParams.get("offset")
+    );
+    const limit = pagination.limit;
+    const offset = pagination.offset;
 
     const where = {
       userId: user.id,
@@ -68,24 +75,53 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const {
-      youtubeUrl,
-      youtubeId,
-      title,
-      description,
-      duration,
-      durationFormatted,
-      thumbnail,
-      uploader,
-      language = "en",
-    } = body;
 
-    if (!title || !duration || !durationFormatted) {
+    // Validate required fields
+    const titleValidation = validateString(body.title, 500, true);
+    if (!titleValidation.valid) {
       return NextResponse.json(
-        { error: "Missing required fields: title, duration, durationFormatted" },
+        { error: "Invalid or missing title" },
         { status: 400 }
       );
     }
+    const title = titleValidation.value!;
+
+    // Validate duration
+    const duration = validateNumber(body.duration, 1, 86400, 0); // Max 24 hours
+    if (duration === 0) {
+      return NextResponse.json(
+        { error: "Invalid or missing duration" },
+        { status: 400 }
+      );
+    }
+
+    // Validate durationFormatted
+    const durationFormattedValidation = validateString(body.durationFormatted, 20, true);
+    if (!durationFormattedValidation.valid) {
+      return NextResponse.json(
+        { error: "Invalid or missing durationFormatted" },
+        { status: 400 }
+      );
+    }
+    const durationFormatted = durationFormattedValidation.value!;
+
+    // Validate optional fields
+    const youtubeUrl = body.youtubeUrl;
+    const youtubeId = body.youtubeId;
+    const thumbnail = body.thumbnail;
+    const uploader = body.uploader;
+
+    // Validate description if provided
+    let description: string | undefined;
+    if (body.description) {
+      const descValidation = validateString(body.description, 5000, false);
+      if (descValidation.valid) {
+        description = descValidation.value;
+      }
+    }
+
+    // Validate language
+    const language = validateLanguage(body.language);
 
     // Check if video already exists by youtubeId for this user
     let video = null;

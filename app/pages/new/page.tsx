@@ -828,57 +828,30 @@ function NewVideoContent() {
     try {
       setIsImprovingTranscript(true);
 
-      // Process chunks in batches for better performance
-      const batchSize = 10;
-      const improvedChunks = [...transcriptData.chunks];
+      // Call server-side API route to improve transcript
+      const response = await fetch("/api/improve-transcript", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chunks: transcriptData.chunks
+        }),
+      });
 
-      for (let i = 0; i < improvedChunks.length; i += batchSize) {
-        const batch = improvedChunks.slice(i, i + batchSize);
-        const batchTexts = batch.map(c => c.text).join("\n\n");
-
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [
-              {
-                role: "system",
-                content: "Fix grammar, spelling, and punctuation errors in the transcript. Maintain the original meaning and structure. Return only the corrected text, preserving line breaks."
-              },
-              {
-                role: "user",
-                content: batchTexts
-              }
-            ],
-            temperature: 0.3,
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to improve transcript batch");
-        }
-
-        const data = await response.json();
-        const correctedText = data.choices[0]?.message?.content || "";
-        const correctedLines = correctedText.split("\n\n");
-
-        // Update chunks with corrected text
-        correctedLines.forEach((line: string, idx: number) => {
-          if (batch[idx] && line.trim()) {
-            improvedChunks[i + idx].text = line.trim();
-          }
-        });
+      if (!response.ok) {
+        throw new Error("Failed to improve transcript");
       }
 
-      // Update transcript data
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to improve transcript");
+      }
+
+      // Update transcript data with improved chunks
       setTranscriptData({
         ...transcriptData,
-        chunks: improvedChunks,
-        transcript: improvedChunks.map(c => c.text).join(" "),
+        chunks: data.chunks,
+        transcript: data.chunks.map((c: any) => c.text).join(" "),
       });
 
       setTranscriptImproved(true);

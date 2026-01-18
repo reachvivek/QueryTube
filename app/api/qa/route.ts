@@ -5,6 +5,14 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Mistral } from "@mistralai/mistralai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import prisma from "@/lib/db";
+import {
+  validateString,
+  validateArray,
+  validateTopK,
+  validateLanguage,
+  validateProvider,
+  validateUUID,
+} from "@/lib/validation";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -62,34 +70,64 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
   try {
-    const {
-      question,
-      videoId,
-      systemPrompt,
-      model,
-      provider,
-      topK = 20,  // Increased from 10
-      language = "en",
-      conversationHistory = []  // NEW: conversation history for context
-    } = await request.json();
+    const body = await request.json();
 
-    if (!question) {
+    // Validate question
+    const questionValidation = validateString(body.question, 1000, true);
+    if (!questionValidation.valid) {
       return NextResponse.json(
-        { error: "Question is required" },
+        { error: questionValidation.error || "Invalid question" },
         { status: 400 }
       );
     }
+    const question = questionValidation.value!;
 
-    // Determine provider and model
-    const aiProvider = provider || process.env.DEFAULT_AI_PROVIDER || "groq";
-    const aiModel = model || process.env.DEFAULT_MODEL ||
+    // Validate videoId if provided
+    if (body.videoId && !validateUUID(body.videoId)) {
+      return NextResponse.json(
+        { error: "Invalid video ID format" },
+        { status: 400 }
+      );
+    }
+    const videoId = body.videoId;
+
+    // Validate system prompt if provided
+    let systemPrompt: string | undefined;
+    if (body.systemPrompt) {
+      const promptValidation = validateString(body.systemPrompt, 5000, false);
+      if (!promptValidation.valid) {
+        return NextResponse.json(
+          { error: "System prompt is too long" },
+          { status: 400 }
+        );
+      }
+      systemPrompt = promptValidation.value;
+    }
+
+    // Validate conversation history
+    const historyValidation = validateArray(body.conversationHistory || [], 50);
+    if (!historyValidation.valid) {
+      return NextResponse.json(
+        { error: "Conversation history exceeds maximum length of 50 messages" },
+        { status: 400 }
+      );
+    }
+    const conversationHistory = historyValidation.array || [];
+
+    // Validate and sanitize parameters
+    const validatedTopK = validateTopK(body.topK);
+    const validatedLanguage = validateLanguage(body.language);
+    const aiProvider = validateProvider(body.provider, ["openai", "groq", "claude"]);
+
+    // Determine model based on provider
+    const aiModel = body.model || process.env.DEFAULT_MODEL ||
       (aiProvider === "groq" ? "llama-3.3-70b-versatile" :
        aiProvider === "claude" ? "claude-3-5-sonnet-20241022" :
        "gpt-4o-mini");
 
     // Detect conversational mode
     const mode = detectConversationalMode(question, conversationHistory);
-    console.log(`[QA] Question: "${question}" | Mode: ${mode} | Video: ${videoId || "all"} | Provider: ${aiProvider} | Model: ${aiModel} | Language: ${language}`);
+    console.log(`[QA] Question: "${question}" | Mode: ${mode} | Video: ${videoId || "all"} | Provider: ${aiProvider} | Model: ${aiModel} | Language: ${validatedLanguage}`);
 
     // Check if this is a broad summary question and if video summary exists
     const isBroadQuestion = mode === "summary";
@@ -151,7 +189,7 @@ export async function POST(request: NextRequest) {
 
     const queryOptions: any = {
       vector: questionEmbedding,
-      topK,
+      topK: validatedTopK,
       includeMetadata: true,
     };
 
@@ -324,7 +362,7 @@ Core rules for ALL modes:
 - Write like a smart human explaining, not a search engine
 - Avoid filler phrases like "you might find more information"
 
-${languageInstructions[language as keyof typeof languageInstructions] || languageInstructions.en}
+${languageInstructions[validatedLanguage as keyof typeof languageInstructions] || languageInstructions.en}
 `;
 
     const defaultSystemPrompt =
