@@ -95,66 +95,88 @@ export function SiteHeader() {
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] sm:w-[320px] bg-white">
-              <div className="flex flex-col gap-6 mt-8">
-                <Link
-                  href="/"
-                  className={`text-lg font-medium transition-colors ${
-                    isActive("/") ? "text-black" : "text-gray-700 hover:text-red-600"
-                  }`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/about"
-                  className={`text-lg font-medium transition-colors ${
-                    isActive("/about") ? "text-black" : "text-gray-700 hover:text-red-600"
-                  }`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  About
-                </Link>
-                <Link
-                  href="/pricing"
-                  className={`text-lg font-medium transition-colors ${
-                    isActive("/pricing") ? "text-black" : "text-gray-700 hover:text-red-600"
-                  }`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Pricing
-                </Link>
-                <Link
-                  href="/docs"
-                  className={`text-lg font-medium transition-colors ${
-                    isActive("/docs") ? "text-black" : "text-gray-700 hover:text-red-600"
-                  }`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Docs
-                </Link>
-                <Link
-                  href="/faq"
-                  className={`text-lg font-medium transition-colors ${
-                    isActive("/faq") ? "text-black" : "text-gray-700 hover:text-red-600"
-                  }`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  FAQ
-                </Link>
+            <SheetContent side="right" className="w-[300px] sm:w-[340px] bg-white">
+              <div className="flex flex-col gap-2 mt-8">
+                {/* Navigation Links */}
+                <nav className="flex flex-col gap-1 mb-4">
+                  <Link
+                    href="/"
+                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
+                      isActive("/")
+                        ? "text-black bg-gray-100"
+                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    href="/about"
+                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
+                      isActive("/about")
+                        ? "text-black bg-gray-100"
+                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <Link
+                    href="/pricing"
+                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
+                      isActive("/pricing")
+                        ? "text-black bg-gray-100"
+                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Pricing
+                  </Link>
+                  <Link
+                    href="/docs"
+                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
+                      isActive("/docs")
+                        ? "text-black bg-gray-100"
+                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Docs
+                  </Link>
+                  <Link
+                    href="/faq"
+                    className={`text-base font-medium px-4 py-3 rounded-xl transition-all ${
+                      isActive("/faq")
+                        ? "text-black bg-gray-100"
+                        : "text-gray-700 hover:text-black hover:bg-gray-50 active:bg-gray-100"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    FAQ
+                  </Link>
+                </nav>
 
-                <div className="h-px bg-gray-200 my-2" />
+                {/* Divider */}
+                <div className="h-px bg-gray-200 my-3" />
 
-                <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full border-gray-300 text-black">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full bg-black text-white hover:bg-gray-800">
-                    Get Started
-                  </Button>
-                </Link>
+                {/* CTA Buttons */}
+                <div className="flex flex-col gap-3 pt-2">
+                  <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
+                    <Button
+                      variant="outline"
+                      className="w-full h-12 border-gray-300 text-black hover:bg-gray-50 rounded-xl font-medium text-base"
+                    >
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
+                    <Button
+                      className="w-full h-12 bg-black text-white hover:bg-gray-800 rounded-xl font-medium text-base shadow-sm"
+                    >
+                      Get Started
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </SheetContent>
           </Sheet>
