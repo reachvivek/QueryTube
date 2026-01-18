@@ -1,7 +1,7 @@
 import YouTube from "youtube-sr";
 import fs from "fs";
 import path from "path";
-import { Innertube } from "youtubei.js";
+import YTDlpWrap from "yt-dlp-wrap";
 
 /**
  * Gets video information without downloading
@@ -50,7 +50,7 @@ export async function getVideoInfo(youtubeUrl: string) {
 }
 
 /**
- * Downloads audio from a YouTube URL using youtubei.js
+ * Downloads audio from a YouTube URL using yt-dlp
  * @param youtubeUrl - The YouTube video URL or ID
  * @param outputPath - Directory to save the audio file
  * @param onProgress - Optional callback for download progress
@@ -69,81 +69,49 @@ export async function downloadYouTubeAudio(
       fs.mkdirSync(outputPath, { recursive: true });
     }
 
-    // Initialize YouTube client with cache to fix "No valid URL to decipher" error
-    // This is required as of January 2026 due to YouTube API changes
-    const youtube = await Innertube.create({
-      cache: undefined, // Disable caching to force fresh player retrieval
-      retrieve_player: true, // Force player retrieval
-    });
-
     // Extract video ID from URL
     const videoId = extractVideoId(youtubeUrl);
     if (!videoId) {
       throw new Error("Invalid YouTube URL");
     }
 
-    // Get video info
-    const videoInfo = await youtube.getInfo(videoId);
-    const title = videoInfo.basic_info.title || "Untitled Video";
-    const duration = videoInfo.basic_info.duration || 0;
+    // Initialize yt-dlp wrapper
+    const ytDlpWrap = new YTDlpWrap();
+
+    // Get video info first
+    const videoInfo = await getVideoInfo(youtubeUrl);
+    const title = videoInfo.title;
+    const duration = videoInfo.duration;
 
     console.log(`[Download] Video: ${title}`);
     console.log(`[Download] Duration: ${duration}s`);
-
-    // Get audio format (best audio quality)
-    const format = videoInfo.chooseFormat({
-      type: "audio",
-      quality: "best",
-    });
-
-    if (!format) {
-      throw new Error("No audio format available for this video");
-    }
 
     // Generate output filename
     const sanitizedTitle = title
       .replace(/[^a-z0-9]/gi, "_")
       .substring(0, 50);
-    const filename = `${sanitizedTitle}_${videoId}.mp4`;
-    const filePath = path.join(outputPath, filename);
+    const filename = `${sanitizedTitle}_${videoId}.%(ext)s`;
+    const outputTemplate = path.join(outputPath, filename);
 
-    // Download audio stream
-    const stream = await videoInfo.download({
-      type: "audio",
-      quality: "best",
-    });
+    // Download audio using yt-dlp with best audio quality
+    // Format: bestaudio[ext=m4a]/bestaudio/best
+    const downloadedFiles = await ytDlpWrap.execPromise([
+      youtubeUrl,
+      "-f", "bestaudio[ext=m4a]/bestaudio/best",
+      "-o", outputTemplate,
+      "--no-playlist",
+      "--no-warnings",
+      "--quiet",
+      "--progress",
+    ]);
 
-    // Write to file with progress tracking
-    const writeStream = fs.createWriteStream(filePath);
-    let downloaded = 0;
-    const total = format.content_length || 0;
-
-    const reader = stream.getReader();
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        writeStream.write(value);
-        downloaded += value.length;
-
-        if (onProgress && total > 0) {
-          const percent = Math.floor((downloaded / total) * 100);
-          onProgress({ percent, downloaded, total });
-        }
-      }
-    } finally {
-      reader.releaseLock();
+    // Find the downloaded file
+    const files = fs.readdirSync(outputPath).filter(f => f.startsWith(sanitizedTitle));
+    if (files.length === 0) {
+      throw new Error("Download completed but file not found");
     }
 
-    writeStream.end();
-
-    // Wait for write to complete
-    await new Promise<void>((resolve, reject) => {
-      writeStream.on("finish", () => resolve());
-      writeStream.on("error", reject);
-    });
-
+    const filePath = path.join(outputPath, files[0]);
     const stats = fs.statSync(filePath);
     const fileSize = stats.size;
 
