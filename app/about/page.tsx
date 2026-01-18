@@ -33,7 +33,7 @@ export default function AboutPage() {
           </h2>
           <div className="text-center max-w-2xl mx-auto">
             <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
-              Long videos are packed with knowledge—but impossible to search.{" "}
+              Long videos are packed with knowledge, but impossible to search.{" "}
               Scrubbing timelines, guessing keywords, and rewatching hours shouldn't be the cost of learning.
             </p>
           </div>
@@ -46,50 +46,50 @@ export default function AboutPage() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-6 sm:mb-8 text-center">
             What Makes QueryTube Different
           </h2>
-          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
             <Card className="border-gray-200">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-start gap-3 mb-2">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3 mb-1.5">
                   <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
                   <h3 className="text-base sm:text-lg font-bold text-black">Timestamp-Grounded Answers</h3>
                 </div>
-                <p className="text-gray-600 text-xs sm:text-sm md:text-base pl-8">
+                <p className="text-gray-600 text-xs sm:text-sm pl-8">
                   Exact moments, not vague summaries.
                 </p>
               </CardContent>
             </Card>
 
             <Card className="border-gray-200">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-start gap-3 mb-2">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3 mb-1.5">
                   <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
                   <h3 className="text-base sm:text-lg font-bold text-black">No Hallucinations</h3>
                 </div>
-                <p className="text-gray-600 text-xs sm:text-sm md:text-base pl-8">
+                <p className="text-gray-600 text-xs sm:text-sm pl-8">
                   If it's not in the video, we don't invent it.
                 </p>
               </CardContent>
             </Card>
 
             <Card className="border-gray-200">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-start gap-3 mb-2">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3 mb-1.5">
                   <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
                   <h3 className="text-base sm:text-lg font-bold text-black">Built for Long-Form Video</h3>
                 </div>
-                <p className="text-gray-600 text-xs sm:text-sm md:text-base pl-8">
+                <p className="text-gray-600 text-xs sm:text-sm pl-8">
                   Lectures, podcasts, interviews.
                 </p>
               </CardContent>
             </Card>
 
             <Card className="border-gray-200">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-start gap-3 mb-2">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3 mb-1.5">
                   <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
                   <h3 className="text-base sm:text-lg font-bold text-black">Privacy-First</h3>
                 </div>
-                <p className="text-gray-600 text-xs sm:text-sm md:text-base pl-8">
+                <p className="text-gray-600 text-xs sm:text-sm pl-8">
                   Your content stays yours.
                 </p>
               </CardContent>
@@ -180,10 +180,10 @@ export default function AboutPage() {
               />
             </div>
             <p className="text-xs sm:text-sm text-gray-600 italic leading-relaxed">
-              "I built QueryTube because I was tired of knowing the answer was in the video—but not where."
+              "I built QueryTube because I was tired of knowing the answer was in the video, but not where."
             </p>
             <p className="text-xs text-gray-500 mt-2">
-              — Vivek Kumar Singh, Founder
+              - Vivek Kumar Singh, Founder
             </p>
           </div>
 

@@ -37,7 +37,7 @@ export default function DocsPage() {
                 <div>
                   <h3 className="font-bold text-black mb-2">1. Sign in with email</h3>
                   <p className="text-gray-700">
-                    Click "Get Started" and enter your email. We'll send you a magic link—no password needed.
+                    Click "Get Started" and enter your email. We'll send you a magic link, no password needed.
                   </p>
                 </div>
                 <div>
@@ -108,7 +108,7 @@ export default function DocsPage() {
                     <div>
                       <strong className="text-black">Answer generation:</strong>
                       <p className="text-gray-700">
-                        Groq's Llama 3.3 70B model synthesizes the answer using only the retrieved chunks—no hallucinations.
+                        Groq's Llama 3.3 70B model synthesizes the answer using only the retrieved chunks, no hallucinations.
                       </p>
                     </div>
                   </div>

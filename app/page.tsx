@@ -51,7 +51,7 @@ export default function LandingPage() {
           </p>
 
           <p className="text-sm sm:text-lg text-gray-500 max-w-2xl mx-auto mb-6 sm:mb-12">
-            Get exact answers from hour-long videos in seconds — with timestamps.
+            Get exact answers from hour-long videos in seconds, with timestamps.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-2">
@@ -83,17 +83,17 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             {/* Feature 1 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-7">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                  <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <CardContent className="p-4 sm:p-5">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
+                  <MessageCircle className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
                 </div>
-                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
+                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
                   Natural Language Q&A
                 </h3>
-                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                   Ask questions in plain English. Get accurate answers with exact timestamps.
                 </p>
               </CardContent>
@@ -101,14 +101,14 @@ export default function LandingPage() {
 
             {/* Feature 2 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-7">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <CardContent className="p-4 sm:p-5">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
+                  <Clock className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
                 </div>
-                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
+                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
                   Timestamp Precision
                 </h3>
-                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                   Jump directly to relevant moments with clickable timestamps.
                 </p>
               </CardContent>
@@ -116,14 +116,14 @@ export default function LandingPage() {
 
             {/* Feature 3 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-7">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                  <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <CardContent className="p-4 sm:p-5">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
+                  <Zap className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
                 </div>
-                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
+                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
                   Instant Processing
                 </h3>
-                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                   Automatic transcription and vectorization. Ready in minutes.
                 </p>
               </CardContent>
@@ -131,14 +131,14 @@ export default function LandingPage() {
 
             {/* Feature 4 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-7">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                  <Search className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <CardContent className="p-4 sm:p-5">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
+                  <Search className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
                 </div>
-                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
+                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
                   Semantic Search
                 </h3>
-                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                   AI understands context and meaning, not just keywords.
                 </p>
               </CardContent>
@@ -146,14 +146,14 @@ export default function LandingPage() {
 
             {/* Feature 5 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-7">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                  <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <CardContent className="p-4 sm:p-5">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
+                  <Globe className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
                 </div>
-                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
+                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
                   Multi-Language
                 </h3>
-                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                   English, French, Hindi support. More languages soon.
                 </p>
               </CardContent>
@@ -161,14 +161,14 @@ export default function LandingPage() {
 
             {/* Feature 6 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-7">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
-                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <CardContent className="p-4 sm:p-5">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
+                  <CheckCircle2 className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
                 </div>
-                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
+                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
                   Source Grounding
                 </h3>
-                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                   See exactly which video segments were used for each answer.
                 </p>
               </CardContent>
