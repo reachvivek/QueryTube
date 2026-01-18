@@ -63,8 +63,8 @@ export async function POST(request: NextRequest) {
       let currentChunk: any = null;
 
       for (const sub of subtitles) {
-        const subStartSec = Math.floor(sub.start / 1000);
-        const subEndSec = Math.floor((sub.start + sub.dur) / 1000);
+        const subStartSec = Math.floor(Number(sub.start) / 1000);
+        const subEndSec = Math.floor((Number(sub.start) + Number(sub.dur)) / 1000);
 
         if (!currentChunk) {
           // Start new chunk

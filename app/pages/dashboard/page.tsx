@@ -173,6 +173,19 @@ export default function Dashboard() {
       if (data.success) {
         // Remove from local state
         setVideos(videos.filter((v) => v.id !== videoId));
+
+        // Clean up localStorage for this video
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(`youtube-qa-session-${videoId}`);
+          localStorage.removeItem(`chat-history-${videoId}`);
+
+          // If this was the last active video, remove that reference too
+          const lastVideo = localStorage.getItem('youtube-qa-last-video');
+          if (lastVideo === videoId) {
+            localStorage.removeItem('youtube-qa-last-video');
+          }
+        }
+
         // Refresh stats
         const statsResponse = await fetch("/api/dashboard");
         try {
