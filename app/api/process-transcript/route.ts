@@ -56,8 +56,8 @@ export async function POST(request: NextRequest) {
       // Convert to our format - COMBINE captions into larger, meaningful chunks
       const fullTranscript = subtitles.map((sub: any) => sub.text).join(" ");
 
-      // Combine caption segments into ~90 second chunks for better context
-      const targetChunkDuration = 90; // seconds
+      // Combine caption segments into ~5 minute chunks for better context
+      const targetChunkDuration = 300; // seconds (5 minutes)
       const combinedChunks: any[] = [];
       let currentChunk: any = null;
 

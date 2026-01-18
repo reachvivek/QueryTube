@@ -802,7 +802,7 @@ function NewVideoContent() {
       return;
     }
 
-    const estimatedTime = Math.ceil(transcriptData.chunks.length / 10); // Rough estimate: 10 chunks per minute
+    const estimatedTime = Math.ceil(transcriptData.chunks.length / 3); // Rough estimate: 3 large chunks per minute
 
     // Show confirmation modal
     const confirmed = await new Promise<boolean>((resolve) => {
@@ -922,9 +922,9 @@ function NewVideoContent() {
       const startTime = Date.now();
       setProcessingStartTime(startTime);
 
-      // Calculate estimated total time based on chunks (roughly 0.5 seconds per chunk)
+      // Calculate estimated total time based on chunks (roughly 1 second per chunk for embeddings + upload)
       const totalChunks = transcriptData.chunks?.length || 0;
-      const estimatedTotalSeconds = Math.max(30, totalChunks * 0.5);
+      const estimatedTotalSeconds = Math.max(20, totalChunks * 1.2);
 
       // Simulate progress during embedding generation (takes ~30 seconds)
       const progressInterval = setInterval(() => {
@@ -1711,7 +1711,7 @@ function NewVideoContent() {
                         </h4>
                         <p className="text-xs text-gray-600 mb-3">
                           Automatically fix any spelling or grammar errors in the transcript.
-                          Takes ~{Math.ceil(transcriptData.chunks.length / 10)} minute(s). (More credits will be used)
+                          Takes ~{Math.ceil(transcriptData.chunks.length / 3)} minute(s). (More credits will be used)
                         </p>
                         <Button
                           onClick={improveTranscript}
