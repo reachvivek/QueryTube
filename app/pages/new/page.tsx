@@ -1059,7 +1059,8 @@ function NewVideoContent() {
     setIsAnswering(true);
 
     // Add user message to chat
-    setChatMessages((prev) => [...prev, { role: "user", content: question }]);
+    const updatedMessages = [...chatMessages, { role: "user", content: question }];
+    setChatMessages(updatedMessages);
 
     try {
       const response = await fetch("/api/qa", {
@@ -1072,6 +1073,7 @@ function NewVideoContent() {
           model: selectedModel,
           provider: selectedProvider,
           language,
+          conversationHistory: chatMessages,  // Send conversation history for context-aware responses
         }),
       });
 
@@ -1550,10 +1552,9 @@ function NewVideoContent() {
                 {/* Success Message */}
                 {processingStatus === "completed" && transcriptData && (
                   <Alert className="bg-green-50 border-green-200">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
                     <AlertDescription className="text-green-900 text-sm flex items-center justify-between">
                       <span>
-                        ✅ Successfully extracted transcript with {transcriptData?.stats?.totalChunks || transcriptData?.chunks?.length || 0} segments!
+                        Successfully extracted transcript with {transcriptData?.stats?.totalChunks || transcriptData?.chunks?.length || 0} segments!
                         {transcriptData?.language && ` Language: ${transcriptData.language.toUpperCase()}`}
                       </span>
                       <Button

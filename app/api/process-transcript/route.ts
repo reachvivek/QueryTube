@@ -56,8 +56,9 @@ export async function POST(request: NextRequest) {
       // Convert to our format - COMBINE captions into larger, meaningful chunks
       const fullTranscript = subtitles.map((sub: any) => sub.text).join(" ");
 
-      // Combine caption segments into ~5 minute chunks for better context
-      const targetChunkDuration = 300; // seconds (5 minutes)
+      // Combine caption segments into 60-90s chunks with better Q&A fidelity (ChatGPT recommendation)
+      const targetChunkDuration = 75; // seconds (60-90s sweet spot)
+      const overlapDuration = 15; // 15s overlap for continuity
       const combinedChunks: any[] = [];
       let currentChunk: any = null;
 
