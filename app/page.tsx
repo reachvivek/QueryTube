@@ -72,12 +72,14 @@ export default function LandingPage() {
       {/* Features Section */}
       <section className="py-12 sm:py-16 lg:py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
-              Stop Scrubbing. Start Searching.
+          <div className="text-center mb-10 sm:mb-16 px-2">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4 leading-tight">
+              Stop Scrubbing.{" "}
+              <br className="sm:hidden" />
+              Start Searching.
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-              QueryTube makes video content as searchable as text documents
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              QueryTube makes video content<br className="sm:hidden" /> as searchable as text documents
             </p>
           </div>
 
@@ -88,10 +90,10 @@ export default function LandingPage() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <MessageCircle className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-black mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
                   Natural Language Q&A
                 </h3>
-                <p className="text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                   Ask questions in plain English. Get accurate answers with exact timestamps from the video.
                 </p>
               </CardContent>
@@ -103,10 +105,10 @@ export default function LandingPage() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <Clock className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-black mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
                   Timestamp Precision
                 </h3>
-                <p className="text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                   Every answer includes clickable timestamps. Jump directly to relevant moments.
                 </p>
               </CardContent>
@@ -118,10 +120,10 @@ export default function LandingPage() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-black mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
                   Instant Processing
                 </h3>
-                <p className="text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                   Automatic transcription, chunking, and vectorization. Ready to query in minutes.
                 </p>
               </CardContent>
@@ -133,10 +135,10 @@ export default function LandingPage() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <Search className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-black mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
                   Semantic Search
                 </h3>
-                <p className="text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                   Not just keyword matching. AI understands context and meaning across your entire library.
                 </p>
               </CardContent>
@@ -148,10 +150,10 @@ export default function LandingPage() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <Globe className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-black mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
                   Multi-Language
                 </h3>
-                <p className="text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                   Full support for English, French, and Hindi. More languages coming soon.
                 </p>
               </CardContent>
@@ -163,10 +165,10 @@ export default function LandingPage() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <CheckCircle2 className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-black mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
                   Source Grounding
                 </h3>
-                <p className="text-base text-gray-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                   Every answer shows its sources. See exactly which video segments were used.
                 </p>
               </CardContent>
