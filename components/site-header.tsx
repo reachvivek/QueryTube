@@ -8,6 +8,7 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import { Menu, Home, Info, DollarSign, FileText, HelpCircle, Sparkles } from "lucide-react";
 
@@ -96,6 +97,7 @@ export function SiteHeader() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[320px] bg-white p-0 flex flex-col">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               {/* Brand Header */}
               <div className="px-6 pt-8 pb-6 border-b border-gray-100">
                 <h2 className="text-2xl font-bold tracking-tight mb-1">
