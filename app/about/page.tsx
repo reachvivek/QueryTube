@@ -172,7 +172,7 @@ export default function AboutPage() {
           <div className="max-w-2xl mx-auto mb-6 sm:mb-8">
             <div className="flex items-center justify-center mb-4">
               <Image
-                src="https://avatars.githubusercontent.com/u/36791114?v=4"
+                src="https://media.licdn.com/dms/image/v2/D5603AQEmLRuRqk5Kzw/profile-displayphoto-scale_400_400/B56Zpq5t.NKAAg-/0/1762730110840?e=1770249600&v=beta&t=xpccqln0QKusWYB9K1WiQ1V-hmIS8A9HqVv9lwTVfes"
                 alt="Vivek Kumar Singh"
                 width={64}
                 height={64}
