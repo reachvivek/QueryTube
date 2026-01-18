@@ -19,9 +19,7 @@ import {
   Clock,
   Globe,
   Sparkles,
-  Youtube,
   Menu,
-  X,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -42,7 +40,19 @@ export default function LandingPage() {
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-6">
+              <Link href="/" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
+                Home
+              </Link>
+              <Link href="/about" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
+                About
+              </Link>
+              <Link href="/pricing" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
+                Pricing
+              </Link>
+              <Link href="/docs" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
+                Docs
+              </Link>
               <Link href="/auth/signin">
                 <Button variant="ghost" className="text-black hover:bg-gray-100">
                   Sign In
@@ -132,8 +142,12 @@ export default function LandingPage() {
             <span className="text-gray-600">Until Now.</span>
           </h1>
 
-          <p className="text-base sm:text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-8 sm:mb-12 px-4">
+          <p className="text-base sm:text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-4 sm:mb-6 px-4">
             Turn long, unsearchable videos into a knowledge base you can talk to.
+          </p>
+
+          <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto mb-8 sm:mb-12 px-4">
+            Get exact answers from hour-long videos in seconds — with timestamps.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3 px-4">
@@ -149,30 +163,68 @@ export default function LandingPage() {
             </Button>
           </div>
 
-          {/* Demo Section */}
-          <div className="max-w-5xl mx-auto">
-            {/* Example Questions Above Demo */}
-            <div className="mb-6 text-center">
-              <p className="text-sm font-medium text-gray-700 mb-3">Ask anything. Jump to exact moments.</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full">
-                  "What does Sam Altman say about AI regulation?"
-                </span>
-                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full">
-                  "Where do they discuss AGI timelines?"
-                </span>
-                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full">
-                  "Summarize the key risks mentioned"
-                </span>
-              </div>
-            </div>
+          {/* Interactive Demo Section */}
+          <div className="max-w-4xl mx-auto">
+            <Card className="border-2 border-gray-200 shadow-2xl bg-white">
+              <CardContent className="p-6 sm:p-8">
+                {/* Video Reference */}
+                <div className="mb-4 text-center">
+                  <p className="text-xs text-gray-500">
+                    Demo video:{" "}
+                    <a
+                      href="https://www.youtube.com/watch?v=ke3Pb9_oMrg"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-red-600 hover:underline"
+                    >
+                      Michael Phelps' Champion Mindset
+                    </a>
+                  </p>
+                </div>
 
-            <Card className="border-2 border-gray-200 shadow-2xl">
-              <CardContent className="p-0">
-                <div className="aspect-video bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-lg flex items-center justify-center">
-                  <div className="text-center text-white p-8">
-                    <Youtube className="w-20 h-20 mx-auto mb-4 opacity-50" />
-                    <p className="text-gray-400 text-sm">Demo Preview</p>
+                {/* Question Input */}
+                <div className="mb-6">
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Ask anything about this video:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value="What makes Michael Phelps different from other swimmers?"
+                      readOnly
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-gray-50 text-black font-medium focus:outline-none"
+                    />
+                    <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  </div>
+                </div>
+
+                {/* Answer */}
+                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                  <p className="text-gray-800 leading-relaxed mb-4">
+                    Michael Phelps stands out because of his{" "}
+                    <span className="font-semibold">discipline and obsession with preparation</span>.
+                  </p>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    At <span className="font-mono text-sm bg-white px-2 py-1 rounded border border-gray-300">[00:04–00:49]</span>, he explains how he measures every practice session by time, not motivation—treating training like a system rather than a feeling.
+                  </p>
+                  <p className="text-gray-700 leading-relaxed">
+                    Around <span className="font-mono text-sm bg-white px-2 py-1 rounded border border-gray-300">[00:06–00:51]</span>, he describes competing against his own standards rather than other swimmers, emphasizing consistency and willingness to do the work every day.
+                  </p>
+                </div>
+
+                {/* Trust indicators */}
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-gray-400" />
+                    <span>Timestamp-grounded</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-gray-400" />
+                    <span>No hallucinations</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-gray-400" />
+                    <span>Built for long-form videos</span>
                   </div>
                 </div>
               </CardContent>
@@ -349,15 +401,15 @@ export default function LandingPage() {
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Review lecture content without rewatching hours of video</span>
+                    <span>Find exam answers in 10 seconds instead of rewatching 2 hours</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Find specific concepts and definitions instantly</span>
+                    <span>Jump to exact concept explanations with timestamps</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Jump to exact timestamps for exam prep</span>
+                    <span>Turn lecture recordings into searchable study guides</span>
                   </li>
                 </ul>
               </CardContent>
@@ -369,15 +421,15 @@ export default function LandingPage() {
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Make your video content more accessible</span>
+                    <span>Answer student questions with exact timestamps</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Answer student questions with precise references</span>
+                    <span>Turn recorded lectures into searchable resources</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Share timestamped insights with your class</span>
+                    <span>Create study guides automatically from video content</span>
                   </li>
                 </ul>
               </CardContent>
@@ -389,15 +441,15 @@ export default function LandingPage() {
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Analyze interview and lecture content efficiently</span>
+                    <span>Search 50 interviews like one document</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Extract insights from podcast archives</span>
+                    <span>Extract themes and patterns across video archives</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Build searchable research libraries</span>
+                    <span>Find exact quotes with citations in seconds</span>
                   </li>
                 </ul>
               </CardContent>
@@ -409,15 +461,15 @@ export default function LandingPage() {
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Search through training videos and webinars</span>
+                    <span>Turn training videos into searchable knowledge bases</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Find specific information in conference talks</span>
+                    <span>Find answers in webinars without watching them again</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Create knowledge bases from video libraries</span>
+                    <span>Search conference talks like text documents</span>
                   </li>
                 </ul>
               </CardContent>
@@ -432,12 +484,15 @@ export default function LandingPage() {
           <h2 className="text-4xl sm:text-5xl font-bold text-black mb-6">
             Stop Scrubbing. Start Asking.
           </h2>
-          <p className="text-xl text-gray-600 mb-12">
+          <p className="text-xl text-gray-600 mb-4">
             Turn any video into a knowledge base in minutes
+          </p>
+          <p className="text-sm text-gray-500 mb-12">
+            Free to try • No credit card required • Start searching in under a minute
           </p>
           <Link href="/auth/signin">
             <Button size="lg" className="bg-black text-white hover:bg-gray-800 text-lg px-12 py-6">
-              Create Your First Knowledge Base
+              Get Started Free
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
@@ -445,8 +500,24 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-12 px-4 sm:px-6 lg:px-8">
+      <footer className="border-t border-gray-200 py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
+          {/* Trust signals */}
+          <div className="flex flex-wrap justify-center items-center gap-8 mb-12 pb-12 border-b border-gray-200">
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-900 mb-1">Built for long-form videos</p>
+              <p className="text-xs text-gray-500">Optimized for 1+ hour content</p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-900 mb-1">Designed for accuracy</p>
+              <p className="text-xs text-gray-500">Timestamp-grounded, no hallucinations</p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-900 mb-1">Privacy-focused</p>
+              <p className="text-xs text-gray-500">Your videos stay private</p>
+            </div>
+          </div>
+
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold">

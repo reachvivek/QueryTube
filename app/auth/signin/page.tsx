@@ -67,9 +67,9 @@ function SignInForm() {
               <span className="text-red-600">Tube</span>
             </h1>
           </div>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
+          <CardTitle className="text-2xl">Get Started</CardTitle>
           <CardDescription>
-            Sign in to your account to continue
+            Sign in to start searching videos
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -113,11 +113,22 @@ function SignInForm() {
                 </>
               )}
             </Button>
+
+            <p className="text-center text-xs text-gray-500">
+              Free to try • No credit card required
+            </p>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
-            <p>We'll send you a magic link to sign in.</p>
-            <p className="mt-1">No password required.</p>
+          <div className="mt-6 space-y-4">
+            <div className="text-center text-sm text-gray-600">
+              <p className="font-medium text-black mb-2">What happens next?</p>
+              <p className="text-xs">You'll paste a video link and start asking questions in under a minute.</p>
+            </div>
+
+            <div className="pt-4 border-t border-gray-200 text-center">
+              <p className="text-xs text-gray-500">We'll send you a magic link to sign in.</p>
+              <p className="text-xs text-gray-500">No password required.</p>
+            </div>
           </div>
         </CardContent>
       </Card>
