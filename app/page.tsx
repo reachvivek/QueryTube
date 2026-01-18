@@ -33,35 +33,35 @@ export default function LandingPage() {
       </section>
 
       {/* Hero Section */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-8 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto text-center w-full">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-black text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-black text-sm font-medium mb-6 sm:mb-8">
             <Sparkles className="w-4 h-4" />
             <span>AI-Powered Video Knowledge Base</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black tracking-tight mb-6 sm:mb-8 leading-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black tracking-tight mb-4 sm:mb-8 leading-tight">
             You Can't <span className="underline decoration-red-600 decoration-4">Ctrl+F</span> Videos.
             <br />
             <span className="text-gray-600">Until Now.</span>
           </h1>
 
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-6 leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-3 sm:mb-6 leading-relaxed">
             Turn long, unsearchable videos into a knowledge base you can talk to.
           </p>
 
-          <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto mb-10 sm:mb-12">
+          <p className="text-sm sm:text-lg text-gray-500 max-w-2xl mx-auto mb-6 sm:mb-12">
             Get exact answers from hour-long videos in seconds — with timestamps.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-2">
             <Link href="/auth/signin" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto bg-black text-white hover:bg-gray-800 text-lg px-8 py-6 h-14 shadow-lg active:scale-95 transition-transform">
+              <Button size="lg" className="w-full sm:w-auto bg-black text-white hover:bg-gray-800 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-12 sm:h-14 shadow-lg active:scale-95 transition-transform">
                 Try Searching a Video
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto text-black border-gray-300 text-lg px-8 py-6 h-14 hover:bg-gray-50 active:scale-95 transition-transform">
+            <Button size="lg" variant="outline" className="w-full sm:w-auto text-black border-gray-300 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-12 sm:h-14 hover:bg-gray-50 active:scale-95 transition-transform">
               <Play className="w-5 h-5 mr-2" />
               Watch Demo
             </Button>
@@ -70,106 +70,106 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
+      <section className="py-8 sm:py-16 lg:py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center mb-10 sm:mb-16 px-2">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4 leading-tight">
+          <div className="text-center mb-6 sm:mb-16 px-2">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-black mb-3 sm:mb-4 leading-tight">
               Stop Scrubbing.{" "}
               <br className="sm:hidden" />
               Start Searching.
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              QueryTube makes video content<br className="sm:hidden" /> as searchable as text documents
+            <p className="text-sm sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              QueryTube makes video content as searchable as text documents
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
             {/* Feature 1 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-6 sm:p-7">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <MessageCircle className="w-6 h-6 text-white" />
+              <CardContent className="p-4 sm:p-7">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                  <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
+                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
                   Natural Language Q&A
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Ask questions in plain English. Get accurate answers with exact timestamps from the video.
+                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                  Ask questions in plain English. Get accurate answers with exact timestamps.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 2 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-6 sm:p-7">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <Clock className="w-6 h-6 text-white" />
+              <CardContent className="p-4 sm:p-7">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
+                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
                   Timestamp Precision
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Every answer includes clickable timestamps. Jump directly to relevant moments.
+                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                  Jump directly to relevant moments with clickable timestamps.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 3 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-6 sm:p-7">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6 text-white" />
+              <CardContent className="p-4 sm:p-7">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                  <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
+                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
                   Instant Processing
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Automatic transcription, chunking, and vectorization. Ready to query in minutes.
+                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                  Automatic transcription and vectorization. Ready in minutes.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 4 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-6 sm:p-7">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <Search className="w-6 h-6 text-white" />
+              <CardContent className="p-4 sm:p-7">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                  <Search className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
+                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
                   Semantic Search
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Not just keyword matching. AI understands context and meaning across your entire library.
+                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                  AI understands context and meaning, not just keywords.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 5 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-6 sm:p-7">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <Globe className="w-6 h-6 text-white" />
+              <CardContent className="p-4 sm:p-7">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                  <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
+                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
                   Multi-Language
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Full support for English, French, and Hindi. More languages coming soon.
+                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                  English, French, Hindi support. More languages soon.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 6 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-6 sm:p-7">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <CheckCircle2 className="w-6 h-6 text-white" />
+              <CardContent className="p-4 sm:p-7">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-black mb-3">
+                <h3 className="text-base sm:text-xl font-bold text-black mb-2 sm:mb-3">
                   Source Grounding
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Every answer shows its sources. See exactly which video segments were used.
+                <p className="text-xs sm:text-base text-gray-600 leading-relaxed">
+                  See exactly which video segments were used for each answer.
                 </p>
               </CardContent>
             </Card>
@@ -178,100 +178,67 @@ export default function LandingPage() {
       </section>
 
       {/* Mobile-only CTA - Early conversion opportunity */}
-      <section className="md:hidden py-8 px-4 bg-white">
+      <section className="md:hidden py-6 px-4 bg-white border-y border-gray-100">
         <div className="max-w-md mx-auto text-center">
           <Link href="/auth/signin">
-            <Button className="w-full h-14 bg-black text-white hover:bg-gray-800 rounded-xl text-base font-semibold shadow-lg">
+            <Button className="w-full h-12 bg-black text-white hover:bg-gray-800 rounded-xl text-sm font-semibold shadow-lg">
               Get Started Free
             </Button>
           </Link>
-          <p className="text-xs text-gray-500 mt-3">No credit card required</p>
+          <p className="text-xs text-gray-500 mt-2">No credit card required</p>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-8 sm:py-12 lg:py-20 px-4 sm:px-6 lg:px-8">
+      {/* How It Works - Desktop only (removed from mobile to reduce scroll) */}
+      <section className="hidden md:block py-12 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto w-full">
-          {/* Mobile: Compact horizontal strip */}
-          <div className="md:hidden">
-            <h2 className="text-2xl font-bold text-black mb-6 text-center">How It Works</h2>
-            <div className="flex items-center justify-between gap-2 max-w-md mx-auto">
-              <div className="flex-1 text-center">
-                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-2">
-                  1
-                </div>
-                <p className="text-xs font-semibold text-black mb-1">Upload</p>
-                <p className="text-xs text-gray-600">Paste link</p>
-              </div>
-              <div className="text-gray-400 text-xl">→</div>
-              <div className="flex-1 text-center">
-                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-2">
-                  2
-                </div>
-                <p className="text-xs font-semibold text-black mb-1">Process</p>
-                <p className="text-xs text-gray-600">AI analyzes</p>
-              </div>
-              <div className="text-gray-400 text-xl">→</div>
-              <div className="flex-1 text-center">
-                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-2">
-                  3
-                </div>
-                <p className="text-xs font-semibold text-black mb-1">Ask</p>
-                <p className="text-xs text-gray-600">Get answers</p>
-              </div>
-            </div>
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
+              Three Steps to Searchable Video
+            </h2>
           </div>
 
-          {/* Desktop: Full version */}
-          <div className="hidden md:block">
-            <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-4">
-                Three Steps to Searchable Video
-              </h2>
+          <div className="grid sm:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
+            <div className="text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
+                1
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Upload</h3>
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                Paste a YouTube URL. We handle transcription, chunking, and embedding.
+              </p>
             </div>
 
-            <div className="grid sm:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
-              <div className="text-center">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
-                  1
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Upload</h3>
-                <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-                  Paste a YouTube URL. We handle transcription, chunking, and embedding.
-                </p>
+            <div className="text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
+                2
               </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Process</h3>
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                AI analyzes the content and builds a searchable knowledge base.
+              </p>
+            </div>
 
-              <div className="text-center">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
-                  2
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Process</h3>
-                <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-                  AI analyzes the content and builds a searchable knowledge base.
-                </p>
+            <div className="text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
+                3
               </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold mx-auto mb-6 shadow-lg">
-                  3
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Ask</h3>
-                <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-                  Get instant, timestamped answers to any question about your video.
-                </p>
-              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-black mb-3">Ask</h3>
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                Get instant, timestamped answers to any question about your video.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Use Cases */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
+      <section className="py-6 sm:py-16 lg:py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
           {/* Mobile: Simple one-liner */}
-          <div className="md:hidden text-center py-6">
-            <p className="text-base text-gray-700 leading-relaxed max-w-lg mx-auto">
-              Built for <span className="font-semibold text-black">students</span>, <span className="font-semibold text-black">educators</span>, <span className="font-semibold text-black">researchers</span>, and <span className="font-semibold text-black">professionals</span> who need to unlock knowledge from long-form videos.
+          <div className="md:hidden text-center py-4">
+            <p className="text-sm text-gray-700 leading-relaxed max-w-lg mx-auto">
+              Built for <span className="font-semibold text-black">students</span>, <span className="font-semibold text-black">educators</span>, <span className="font-semibold text-black">researchers</span>, and <span className="font-semibold text-black">professionals</span>.
             </p>
           </div>
 
@@ -392,21 +359,21 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-8 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl sm:text-5xl font-bold text-black mb-6">
+          <h2 className="text-2xl sm:text-5xl font-bold text-black mb-4 sm:mb-6">
             Stop Scrubbing. Start Asking.
           </h2>
-          <p className="text-xl text-gray-600 mb-4">
+          <p className="text-base sm:text-xl text-gray-600 mb-2 sm:mb-4">
             Turn any video into a knowledge base in minutes
           </p>
-          <p className="text-sm text-gray-500 mb-12">
-            Free to try • No credit card required • Start searching in under a minute
+          <p className="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-12">
+            Free to try • No credit card required
           </p>
           <Link href="/auth/signin">
-            <Button size="lg" className="bg-black text-white hover:bg-gray-800 text-lg px-12 py-6">
+            <Button size="lg" className="bg-black text-white hover:bg-gray-800 text-base sm:text-lg px-8 sm:px-12 py-5 sm:py-6 h-12 sm:h-auto">
               Get Started Free
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
             </Button>
           </Link>
         </div>
