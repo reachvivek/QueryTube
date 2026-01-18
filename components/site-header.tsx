@@ -104,15 +104,17 @@ export function SiteHeader() {
                   <span className="text-black">Query</span>
                   <span className="text-red-600">Tube</span>
                 </h2>
-                <p className="text-sm text-gray-600 leading-snug">
-                  Ask questions. Get timestamped answers.
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Ask questions.{" "}
+                  <br />
+                  Get timestamped answers.
                 </p>
               </div>
 
               {/* Scrollable Menu Content */}
-              <div className="flex-1 overflow-y-auto px-4 py-4">
+              <div className="flex-1 overflow-y-auto px-4 py-3">
                 {/* MAIN Section */}
-                <div className="mb-6">
+                <div className="mb-5">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">
                     Main
                   </p>
@@ -133,7 +135,7 @@ export function SiteHeader() {
                 </div>
 
                 {/* PRODUCT Section */}
-                <div className="mb-6">
+                <div className="mb-5">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">
                     Product
                   </p>
@@ -166,7 +168,7 @@ export function SiteHeader() {
                 </div>
 
                 {/* RESOURCES Section */}
-                <div className="mb-6">
+                <div className="mb-4">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">
                     Resources
                   </p>
@@ -210,7 +212,7 @@ export function SiteHeader() {
               {/* Sticky CTA Footer */}
               <div className="border-t border-gray-100 p-4 bg-white">
                 <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full h-12 bg-black text-white hover:bg-gray-800 rounded-xl font-semibold text-base shadow-md mb-3">
+                  <Button className="w-full h-12 bg-black text-white hover:bg-gray-800 rounded-xl font-semibold text-base shadow-md mb-2.5">
                     Get Started Free
                   </Button>
                 </Link>
@@ -218,9 +220,9 @@ export function SiteHeader() {
                   <Link
                     href="/auth/signin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-sm text-gray-600 hover:text-black transition-colors"
+                    className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
                   >
-                    Already have an account? <span className="font-medium underline">Sign in</span>
+                    Already have an account? <span className="font-medium">Sign in</span>
                   </Link>
                 </div>
               </div>
