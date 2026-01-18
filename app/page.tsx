@@ -83,94 +83,118 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+          <div className="grid sm:grid-cols-2 gap-2.5 sm:gap-3">
             {/* Feature 1 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-5">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
-                  <MessageCircle className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
+              <CardContent className="p-3 sm:p-3.5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-black mb-0.5 sm:mb-1">
+                      Natural Language Q&A
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-snug">
+                      Ask questions in plain English. Get accurate answers with exact timestamps.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
-                  Natural Language Q&A
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                  Ask questions in plain English. Get accurate answers with exact timestamps.
-                </p>
               </CardContent>
             </Card>
 
             {/* Feature 2 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-5">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
-                  <Clock className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
+              <CardContent className="p-3 sm:p-3.5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-black mb-0.5 sm:mb-1">
+                      Timestamp Precision
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-snug">
+                      Jump directly to relevant moments with clickable timestamps.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
-                  Timestamp Precision
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                  Jump directly to relevant moments with clickable timestamps.
-                </p>
               </CardContent>
             </Card>
 
             {/* Feature 3 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-5">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
-                  <Zap className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
+              <CardContent className="p-3 sm:p-3.5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-black mb-0.5 sm:mb-1">
+                      Instant Processing
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-snug">
+                      Automatic transcription and vectorization. Ready in minutes.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
-                  Instant Processing
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                  Automatic transcription and vectorization. Ready in minutes.
-                </p>
               </CardContent>
             </Card>
 
             {/* Feature 4 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-5">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
-                  <Search className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
+              <CardContent className="p-3 sm:p-3.5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Search className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-black mb-0.5 sm:mb-1">
+                      Semantic Search
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-snug">
+                      AI understands context and meaning, not just keywords.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
-                  Semantic Search
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                  AI understands context and meaning, not just keywords.
-                </p>
               </CardContent>
             </Card>
 
             {/* Feature 5 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-5">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
-                  <Globe className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
+              <CardContent className="p-3 sm:p-3.5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Globe className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-black mb-0.5 sm:mb-1">
+                      Multi-Language
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-snug">
+                      English, French, Hindi support. More languages soon.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
-                  Multi-Language
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                  English, French, Hindi support. More languages soon.
-                </p>
               </CardContent>
             </Card>
 
             {/* Feature 6 */}
             <Card className="border-gray-200 hover:border-black hover:shadow-lg transition-all">
-              <CardContent className="p-4 sm:p-5">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-black rounded-lg flex items-center justify-center mb-2 sm:mb-3">
-                  <CheckCircle2 className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" />
+              <CardContent className="p-3 sm:p-3.5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-black mb-0.5 sm:mb-1">
+                      Source Grounding
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-snug">
+                      See exactly which video segments were used for each answer.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-black mb-1.5 sm:mb-2">
-                  Source Grounding
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                  See exactly which video segments were used for each answer.
-                </p>
               </CardContent>
             </Card>
           </div>
