@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import {
   Play,
   Search,
@@ -19,119 +13,28 @@ import {
   Clock,
   Globe,
   Sparkles,
-  Menu,
+  GraduationCap,
+  BookOpen,
+  Microscope,
+  Briefcase,
 } from "lucide-react";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { AnimatedDemo } from "@/components/animated-demo";
 
 export default function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo - Always visible */}
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-                <span className="text-black">Query</span>
-                <span className="text-red-600">Tube</span>
-              </h1>
-            </div>
+    <div className="bg-white">
+      <SiteHeader />
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-6">
-              <Link href="/" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
-                About
-              </Link>
-              <Link href="/pricing" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
-                Pricing
-              </Link>
-              <Link href="/docs" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
-                Docs
-              </Link>
-              <Link href="/auth/signin">
-                <Button variant="ghost" className="text-black hover:bg-gray-100">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/auth/signin">
-                <Button className="bg-black text-white hover:bg-gray-800">
-                  Get Started
-                </Button>
-              </Link>
-            </div>
+      {/* Interactive Demo Section - Full Viewport */}
+      <section className="min-h-screen flex items-center relative">
+        <AnimatedDemo />
+      </section>
 
-            {/* Mobile Hamburger Menu */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  aria-label="Open menu"
-                >
-                  <Menu className="w-6 h-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] sm:w-[320px] bg-white">
-                <div className="flex flex-col gap-6 mt-8">
-                  {/* Menu Items */}
-                  <Link
-                    href="/"
-                    className="text-lg font-medium text-black hover:text-red-600 transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    href="/about"
-                    className="text-lg font-medium text-black hover:text-red-600 transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    About
-                  </Link>
-                  <Link
-                    href="/pricing"
-                    className="text-lg font-medium text-black hover:text-red-600 transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Pricing
-                  </Link>
-                  <Link
-                    href="/docs"
-                    className="text-lg font-medium text-black hover:text-red-600 transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Docs
-                  </Link>
-
-                  <div className="h-px bg-gray-200 my-2" />
-
-                  {/* Auth Buttons */}
-                  <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full border-gray-300 text-black">
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full bg-black text-white hover:bg-gray-800">
-                      Get Started
-                    </Button>
-                  </Link>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
+      {/* Hero Section - Full Viewport */}
+      <section className="min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center w-full">
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gray-100 text-black text-xs sm:text-sm font-medium mb-6 sm:mb-8">
             <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
             <span>AI-Powered Video Knowledge Base</span>
@@ -150,7 +53,7 @@ export default function LandingPage() {
             Get exact answers from hour-long videos in seconds — with timestamps.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3 px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4">
             <Link href="/auth/signin" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto bg-black text-white hover:bg-gray-800 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6">
                 Try Searching a Video
@@ -162,100 +65,32 @@ export default function LandingPage() {
               Watch Demo
             </Button>
           </div>
-
-          {/* Interactive Demo Section */}
-          <div className="max-w-4xl mx-auto">
-            <Card className="border-2 border-gray-200 shadow-2xl bg-white">
-              <CardContent className="p-6 sm:p-8">
-                {/* Video Reference */}
-                <div className="mb-4 text-center">
-                  <p className="text-xs text-gray-500">
-                    Demo video:{" "}
-                    <a
-                      href="https://www.youtube.com/watch?v=ke3Pb9_oMrg"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-red-600 hover:underline"
-                    >
-                      Michael Phelps' Champion Mindset
-                    </a>
-                  </p>
-                </div>
-
-                {/* Question Input */}
-                <div className="mb-6">
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Ask anything about this video:
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value="What makes Michael Phelps different from other swimmers?"
-                      readOnly
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-gray-50 text-black font-medium focus:outline-none"
-                    />
-                    <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  </div>
-                </div>
-
-                {/* Answer */}
-                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <p className="text-gray-800 leading-relaxed mb-4">
-                    Michael Phelps stands out because of his{" "}
-                    <span className="font-semibold">discipline and obsession with preparation</span>.
-                  </p>
-                  <p className="text-gray-700 leading-relaxed mb-4">
-                    At <span className="font-mono text-sm bg-white px-2 py-1 rounded border border-gray-300">[00:04–00:49]</span>, he explains how he measures every practice session by time, not motivation—treating training like a system rather than a feeling.
-                  </p>
-                  <p className="text-gray-700 leading-relaxed">
-                    Around <span className="font-mono text-sm bg-white px-2 py-1 rounded border border-gray-300">[00:06–00:51]</span>, he describes competing against his own standards rather than other swimmers, emphasizing consistency and willingness to do the work every day.
-                  </p>
-                </div>
-
-                {/* Trust indicators */}
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-gray-400" />
-                    <span>Timestamp-grounded</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-gray-400" />
-                    <span>No hallucinations</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-gray-400" />
-                    <span>Built for long-form videos</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-24 bg-gray-50 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4">
+      {/* Features Section - Full Viewport */}
+      <section className="min-h-screen max-h-screen flex items-center bg-gray-50 px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-3">
               Stop Scrubbing. Start Searching.
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
               QueryTube makes video content as searchable as text documents
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {/* Feature 1 */}
             <Card className="border-gray-200 hover:border-black transition-colors">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <MessageCircle className="w-6 h-6 text-white" />
+              <CardContent className="p-5">
+                <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mb-3">
+                  <MessageCircle className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-base font-bold text-black mb-1.5">
                   Natural Language Q&A
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm text-gray-600">
                   Ask questions in plain English. Get accurate answers with exact timestamps from the video.
                 </p>
               </CardContent>
@@ -263,14 +98,14 @@ export default function LandingPage() {
 
             {/* Feature 2 */}
             <Card className="border-gray-200 hover:border-black transition-colors">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <Clock className="w-6 h-6 text-white" />
+              <CardContent className="p-5">
+                <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mb-3">
+                  <Clock className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-base font-bold text-black mb-1.5">
                   Timestamp Precision
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm text-gray-600">
                   Every answer includes clickable timestamps. Jump directly to relevant moments.
                 </p>
               </CardContent>
@@ -278,14 +113,14 @@ export default function LandingPage() {
 
             {/* Feature 3 */}
             <Card className="border-gray-200 hover:border-black transition-colors">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6 text-white" />
+              <CardContent className="p-5">
+                <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mb-3">
+                  <Zap className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-base font-bold text-black mb-1.5">
                   Instant Processing
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm text-gray-600">
                   Automatic transcription, chunking, and vectorization. Ready to query in minutes.
                 </p>
               </CardContent>
@@ -293,14 +128,14 @@ export default function LandingPage() {
 
             {/* Feature 4 */}
             <Card className="border-gray-200 hover:border-black transition-colors">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <Search className="w-6 h-6 text-white" />
+              <CardContent className="p-5">
+                <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mb-3">
+                  <Search className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-base font-bold text-black mb-1.5">
                   Semantic Search
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm text-gray-600">
                   Not just keyword matching. AI understands context and meaning across your entire library.
                 </p>
               </CardContent>
@@ -308,14 +143,14 @@ export default function LandingPage() {
 
             {/* Feature 5 */}
             <Card className="border-gray-200 hover:border-black transition-colors">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <Globe className="w-6 h-6 text-white" />
+              <CardContent className="p-5">
+                <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mb-3">
+                  <Globe className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-base font-bold text-black mb-1.5">
                   Multi-Language
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm text-gray-600">
                   Full support for English, French, and Hindi. More languages coming soon.
                 </p>
               </CardContent>
@@ -323,14 +158,14 @@ export default function LandingPage() {
 
             {/* Feature 6 */}
             <Card className="border-gray-200 hover:border-black transition-colors">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
-                  <CheckCircle2 className="w-6 h-6 text-white" />
+              <CardContent className="p-5">
+                <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mb-3">
+                  <CheckCircle2 className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-base font-bold text-black mb-1.5">
                   Source Grounding
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm text-gray-600">
                   Every answer shows its sources. See exactly which video segments were used.
                 </p>
               </CardContent>
@@ -339,42 +174,42 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4">
+      {/* How It Works - Full Viewport */}
+      <section className="min-h-screen max-h-screen flex items-center px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-3">
               Three Steps to Searchable Video
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+              <div className="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                 1
               </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Upload</h3>
-              <p className="text-gray-600">
+              <h3 className="text-lg font-bold text-black mb-2">Upload</h3>
+              <p className="text-sm text-gray-600">
                 Paste a YouTube URL. We handle transcription, chunking, and embedding.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+              <div className="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                 2
               </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Process</h3>
-              <p className="text-gray-600">
+              <h3 className="text-lg font-bold text-black mb-2">Process</h3>
+              <p className="text-sm text-gray-600">
                 AI analyzes the content and builds a searchable knowledge base.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+              <div className="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                 3
               </div>
-              <h3 className="text-2xl font-bold text-black mb-3">Ask</h3>
-              <p className="text-gray-600">
+              <h3 className="text-lg font-bold text-black mb-2">Ask</h3>
+              <p className="text-sm text-gray-600">
                 Get instant, timestamped answers to any question about your video.
               </p>
             </div>
@@ -382,94 +217,114 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Use Cases */}
-      <section className="py-24 bg-gray-50 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4">
+      {/* Use Cases - Full Viewport */}
+      <section className="min-h-screen max-h-screen flex items-center bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black mb-2">
               Built for Learners
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-base sm:text-lg text-gray-600">
               Perfect for education, research, and content analysis
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-4">
             <Card className="border-gray-200">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold text-black mb-4">🎓 Students</h3>
-                <ul className="space-y-3 text-gray-600">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Find exam answers in 10 seconds instead of rewatching 2 hours</span>
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <GraduationCap className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-black">Students</h3>
+                </div>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Find exam answers in 10 seconds instead of rewatching 2 hours</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Jump to exact concept explanations with timestamps</span>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Jump to exact concept explanations with timestamps</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Turn lecture recordings into searchable study guides</span>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Turn lecture recordings into searchable study guides</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
             <Card className="border-gray-200">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold text-black mb-4">📚 Educators</h3>
-                <ul className="space-y-3 text-gray-600">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Answer student questions with exact timestamps</span>
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-green-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-black">Educators</h3>
+                </div>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Answer student questions with exact timestamps</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Turn recorded lectures into searchable resources</span>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Turn recorded lectures into searchable resources</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Create study guides automatically from video content</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-gray-200">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold text-black mb-4">🔬 Researchers</h3>
-                <ul className="space-y-3 text-gray-600">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Search 50 interviews like one document</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Extract themes and patterns across video archives</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Find exact quotes with citations in seconds</span>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Create study guides automatically from video content</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
             <Card className="border-gray-200">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold text-black mb-4">💼 Professionals</h3>
-                <ul className="space-y-3 text-gray-600">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Turn training videos into searchable knowledge bases</span>
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Microscope className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-black">Researchers</h3>
+                </div>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Search 50 interviews like one document</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Find answers in webinars without watching them again</span>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Extract themes and patterns across video archives</span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span>Search conference talks like text documents</span>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Find exact quotes with citations in seconds</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-gray-200">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-black">Professionals</h3>
+                </div>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Turn training videos into searchable knowledge bases</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Find answers in webinars without watching them again</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Search conference talks like text documents</span>
                   </li>
                 </ul>
               </CardContent>
@@ -499,54 +354,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          {/* Trust signals */}
-          <div className="flex flex-wrap justify-center items-center gap-8 mb-12 pb-12 border-b border-gray-200">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-900 mb-1">Built for long-form videos</p>
-              <p className="text-xs text-gray-500">Optimized for 1+ hour content</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-900 mb-1">Designed for accuracy</p>
-              <p className="text-xs text-gray-500">Timestamp-grounded, no hallucinations</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-900 mb-1">Privacy-focused</p>
-              <p className="text-xs text-gray-500">Your videos stay private</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold">
-                <span className="text-black">Query</span>
-                <span className="text-red-600">Tube</span>
-              </h1>
-              <span className="text-gray-400">•</span>
-              <span className="text-sm text-gray-600">Videos hide knowledge. We unlock it.</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-gray-600">
-              <Link href="/" className="hover:text-black transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="hover:text-black transition-colors">
-                About
-              </Link>
-              <Link href="/pricing" className="hover:text-black transition-colors">
-                Pricing
-              </Link>
-              <Link href="/docs" className="hover:text-black transition-colors">
-                Docs
-              </Link>
-            </div>
-          </div>
-          <div className="mt-8 text-center text-sm text-gray-500">
-            © 2026 QueryTube. Built by Vivek Kumar Singh.
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

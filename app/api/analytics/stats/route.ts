@@ -15,7 +15,7 @@ export async function GET() {
       select: { id: true },
     });
 
-    const videoIds = userVideos.map((v) => v.id);
+    const videoIds = userVideos.map((v: { id: string }) => v.id);
 
     if (videoIds.length === 0) {
       return NextResponse.json({

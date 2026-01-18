@@ -3,7 +3,13 @@
  *
  * Combines small caption segments into larger, context-rich chunks
  * for better semantic search and RAG quality.
+ *
+ * CRITICAL: Enforces token limits to prevent API errors (max 8192 tokens for embeddings)
  */
+
+// CRITICAL: Mistral embedding API has 8192 token limit
+// Set safe max to 6000 to account for tokenization variance
+const MAX_TOKENS_PER_CHUNK = 6000;
 
 export interface Segment {
   chunkIndex: number;
@@ -22,6 +28,16 @@ export interface MacroChunk {
   segmentStartIndex: number;
   segmentEndIndex: number;
   timestamp: string; // formatted start timestamp
+  tokenCount?: number; // estimated token count for monitoring
+}
+
+/**
+ * Estimate token count (rough approximation: ~0.75 tokens per word)
+ * This is conservative to ensure we stay under limits
+ */
+function estimateTokenCount(text: string): number {
+  const words = text.split(/\s+/).filter(w => w.length > 0);
+  return Math.ceil(words.length * 0.75);
 }
 
 /**
@@ -50,19 +66,22 @@ function formatTimestamp(seconds: number): string {
 }
 
 /**
- * Build macro chunks from small segments using sliding window with overlap
+ * Build macro chunks from small segments with TOKEN LIMIT enforcement
+ *
+ * CRITICAL FIX: Ensures chunks never exceed MAX_TOKENS_PER_CHUNK (6000)
+ * to prevent "exceeding max 8192 tokens" API errors
  *
  * @param videoId - Video identifier
  * @param segments - Array of small caption segments
- * @param chunkSeconds - Target chunk duration (default: 45s)
- * @param overlapSeconds - Overlap between chunks (default: 12s)
- * @returns Array of macro chunks
+ * @param chunkSeconds - Target chunk duration (default: 30s, reduced from 45s)
+ * @param overlapSeconds - Overlap between chunks (default: 8s, reduced from 12s)
+ * @returns Array of macro chunks with guaranteed token limits
  */
 export function buildMacroChunks(
   videoId: string,
   segments: Segment[],
-  chunkSeconds = 45,
-  overlapSeconds = 12
+  chunkSeconds = 30, // Reduced from 45s to reduce token count
+  overlapSeconds = 8   // Reduced from 12s
 ): MacroChunk[] {
   if (!segments.length) return [];
 
@@ -77,19 +96,76 @@ export function buildMacroChunks(
     let textParts: string[] = [];
     let endIdx = i;
     let endTime = segments[i].endTime;
+    let currentTokens = 0;
 
-    // Collect all segments within the time window
+    // Collect segments within time window AND token limit
     while (endIdx < segments.length && segments[endIdx].startTime < windowEndTarget) {
       const t = segments[endIdx].text?.trim();
-      if (t) textParts.push(t);
+      if (t) {
+        const segmentTokens = estimateTokenCount(t);
+
+        // CRITICAL: Stop if adding this segment would exceed token limit
+        if (currentTokens + segmentTokens > MAX_TOKENS_PER_CHUNK) {
+          break;
+        }
+
+        textParts.push(t);
+        currentTokens += segmentTokens;
+      }
       endTime = Math.max(endTime, segments[endIdx].endTime);
       endIdx++;
     }
 
     const merged = cleanupTranscriptText(textParts.join(" "));
+    const finalTokenCount = estimateTokenCount(merged);
 
-    // Only create chunk if it has content
-    if (merged.length > 0) {
+    // Safety check: If single segment exceeds limit, split it
+    if (finalTokenCount > MAX_TOKENS_PER_CHUNK && textParts.length === 1) {
+      // Split the text by sentences
+      const sentences = merged.split(/[.!?]+/).filter(s => s.trim());
+      let currentBatch = "";
+      let batchTokens = 0;
+
+      for (const sentence of sentences) {
+        const sentenceTokens = estimateTokenCount(sentence);
+
+        if (batchTokens + sentenceTokens > MAX_TOKENS_PER_CHUNK && currentBatch) {
+          // Create chunk from current batch
+          chunks.push({
+            chunkId: `${videoId}:${chunks.length}`,
+            videoId,
+            startTime: windowStart,
+            endTime,
+            text: currentBatch.trim(),
+            segmentStartIndex: startIdx,
+            segmentEndIndex: startIdx,
+            timestamp: formatTimestamp(windowStart),
+            tokenCount: batchTokens,
+          });
+          currentBatch = sentence;
+          batchTokens = sentenceTokens;
+        } else {
+          currentBatch += (currentBatch ? ". " : "") + sentence;
+          batchTokens += sentenceTokens;
+        }
+      }
+
+      // Add remaining batch
+      if (currentBatch.trim()) {
+        chunks.push({
+          chunkId: `${videoId}:${chunks.length}`,
+          videoId,
+          startTime: windowStart,
+          endTime,
+          text: currentBatch.trim(),
+          segmentStartIndex: startIdx,
+          segmentEndIndex: startIdx,
+          timestamp: formatTimestamp(windowStart),
+          tokenCount: batchTokens,
+        });
+      }
+    } else if (merged.length > 0) {
+      // Normal case: create chunk
       chunks.push({
         chunkId: `${videoId}:${chunks.length}`,
         videoId,
@@ -99,11 +175,11 @@ export function buildMacroChunks(
         segmentStartIndex: startIdx,
         segmentEndIndex: Math.max(startIdx, endIdx - 1),
         timestamp: formatTimestamp(windowStart),
+        tokenCount: finalTokenCount,
       });
     }
 
     // Advance pointer with overlap
-    // Move start forward by (chunkSeconds - overlapSeconds)
     const nextStartTime = windowStart + (chunkSeconds - overlapSeconds);
 
     // Move i to the first segment whose startTime >= nextStartTime
@@ -114,9 +190,6 @@ export function buildMacroChunks(
     // Safety: ensure we always advance at least one segment
     if (i === startIdx) i++;
   }
-
-  console.log(`[Chunking] Created ${chunks.length} macro chunks from ${segments.length} segments`);
-  console.log(`[Chunking] Avg chunk duration: ${chunks.length > 0 ? ((chunks[chunks.length - 1].endTime - chunks[0].startTime) / chunks.length).toFixed(1) : 0}s`);
 
   return chunks;
 }

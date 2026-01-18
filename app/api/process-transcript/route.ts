@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSubtitles } from "youtube-caption-extractor";
+import { YoutubeTranscript } from "youtube-transcript";
 import { downloadYouTubeAudio } from "@/lib/youtube";
 import { transcribeAudio, splitTranscriptIntoChunks, addTimestampsToChunks } from "@/lib/transcribe";
 import fs from "fs";
@@ -29,64 +29,58 @@ export async function POST(request: NextRequest) {
   try {
     // ============= STEP 1: Try YouTube Captions (Fast Method) =============
 
-    let subtitles;
+    let transcript;
     try {
-      // Try requested language first
-      subtitles = await getSubtitles({ videoID: videoId, lang: requestedLang });
+      // Try requested language first with youtube-transcript (more reliable)
+      transcript = await YoutubeTranscript.fetchTranscript(videoId, {
+        lang: requestedLang,
+      });
       detectedLanguage = requestedLang;
     } catch (error) {
-      // Fallback to French if not the requested language
-      if (requestedLang !== "fr") {
-        try {
-          subtitles = await getSubtitles({ videoID: videoId, lang: "fr" });
-          detectedLanguage = "fr";
-        } catch (frError) {
-          // Fallback to English
-          subtitles = await getSubtitles({ videoID: videoId, lang: "en" });
-          detectedLanguage = "en";
-        }
-      } else {
-        // If French was requested and failed, try English
-        subtitles = await getSubtitles({ videoID: videoId, lang: "en" });
-        detectedLanguage = "en";
+      // Fallback: try without language constraint (auto-detect)
+      try {
+        transcript = await YoutubeTranscript.fetchTranscript(videoId);
+        detectedLanguage = "auto";
+      } catch (fallbackError) {
+        // YouTube captions not available, will try Whisper next
+        transcript = null;
       }
     }
 
-    if (subtitles && subtitles.length > 0) {
+    if (transcript && transcript.length > 0) {
       // Convert to our format - COMBINE captions into larger, meaningful chunks
-      const fullTranscript = subtitles.map((sub: any) => sub.text).join(" ");
+      const fullTranscript = transcript.map((item: any) => item.text).join(" ");
 
-      // Combine caption segments into 60-90s chunks with better Q&A fidelity (ChatGPT recommendation)
+      // Combine caption segments into 60-90s chunks with better Q&A fidelity
       const targetChunkDuration = 75; // seconds (60-90s sweet spot)
-      const overlapDuration = 15; // 15s overlap for continuity
       const combinedChunks: any[] = [];
       let currentChunk: any = null;
 
-      for (const sub of subtitles) {
-        const subStartSec = Math.floor(Number(sub.start) / 1000);
-        const subEndSec = Math.floor((Number(sub.start) + Number(sub.dur)) / 1000);
+      for (const item of transcript) {
+        const subStartSec = Math.floor(Number(item.offset) / 1000);
+        const subEndSec = Math.floor((Number(item.offset) + Number(item.duration)) / 1000);
 
         if (!currentChunk) {
           // Start new chunk
           currentChunk = {
-            text: sub.text,
+            text: item.text,
             startTime: subStartSec,
             endTime: subEndSec,
           };
         } else {
-          // Calculate how long this chunk would be if we add this subtitle
+          // Calculate how long this chunk would be if we add this item
           const potentialEndTime = subEndSec;
           const potentialDuration = potentialEndTime - currentChunk.startTime;
 
           if (potentialDuration <= targetChunkDuration) {
             // Still under limit, add to current chunk
-            currentChunk.text += " " + sub.text;
+            currentChunk.text += " " + item.text;
             currentChunk.endTime = subEndSec;
           } else {
             // Would exceed limit, save current chunk and start new one
             combinedChunks.push(currentChunk);
             currentChunk = {
-              text: sub.text,
+              text: item.text,
               startTime: subStartSec,
               endTime: subEndSec,
             };
@@ -104,12 +98,6 @@ export async function POST(request: NextRequest) {
         ...chunk,
         chunkIndex: index,
       }));
-
-      // Debug logging
-      console.log(`[ProcessTranscript] Combined ${subtitles.length} captions into ${chunks.length} chunks`);
-      console.log(`[ProcessTranscript] First chunk: ${chunks[0]?.startTime}s - ${chunks[0]?.endTime}s (${chunks[0]?.text?.substring(0, 100)}...)`);
-      console.log(`[ProcessTranscript] Last chunk: ${chunks[chunks.length-1]?.startTime}s - ${chunks[chunks.length-1]?.endTime}s`);
-      console.log(`[ProcessTranscript] Sample subtitle times: start=${subtitles[0]?.start}, dur=${subtitles[0]?.dur}`);
 
       return NextResponse.json({
         success: true,

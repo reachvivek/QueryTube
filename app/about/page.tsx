@@ -1,52 +1,14 @@
-"use client";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="border-b border-gray-200 bg-white sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-                <span className="text-black">Query</span>
-                <span className="text-red-600">Tube</span>
-              </h1>
-            </Link>
-            <div className="hidden md:flex items-center gap-6">
-              <Link href="/" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="text-sm font-medium text-black">
-                About
-              </Link>
-              <Link href="/pricing" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
-                Pricing
-              </Link>
-              <Link href="/docs" className="text-sm font-medium text-gray-700 hover:text-black transition-colors">
-                Docs
-              </Link>
-              <Link href="/auth/signin">
-                <Button className="bg-black text-white hover:bg-gray-800">
-                  Get Started
-                </Button>
-              </Link>
-            </div>
-            <div className="md:hidden">
-              <Link href="/auth/signin">
-                <Button className="bg-black text-white hover:bg-gray-800">
-                  Get Started
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       {/* Hero */}
       <section className="pt-16 sm:pt-24 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8">
@@ -233,28 +195,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-sm text-gray-600">
-            <Link href="/" className="hover:text-black transition-colors">
-              Home
-            </Link>
-            <Link href="/about" className="hover:text-black transition-colors">
-              About
-            </Link>
-            <Link href="/pricing" className="hover:text-black transition-colors">
-              Pricing
-            </Link>
-            <Link href="/docs" className="hover:text-black transition-colors">
-              Docs
-            </Link>
-          </div>
-          <div className="mt-6 text-sm text-gray-500">
-            © 2026 QueryTube. Built by Vivek Kumar Singh.
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSubtitles } from "youtube-caption-extractor";
+import { YoutubeTranscript } from "youtube-transcript";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,7 +8,6 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch (parseError) {
-      console.error("Failed to parse request body:", parseError);
       return NextResponse.json(
         {
           success: false,
@@ -32,34 +31,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Try to get transcript in specified language or auto-detect
-    const requestedLang = language || "en"; // Default to English, but will try other languages if not available
-    let actualLang = requestedLang; // Track which language actually succeeded
+    // Try to get transcript with language fallback
+    const requestedLang = language || "en";
+    let actualLang = requestedLang;
+    let transcript;
 
-    let subtitles;
     try {
-      // Try the specified language first
-      subtitles = await getSubtitles({ videoID: videoId, lang: requestedLang });
-      actualLang = requestedLang;
-    } catch (error) {
-      // If specified language fails, try French
-      if (requestedLang !== "fr") {
-        try {
-          subtitles = await getSubtitles({ videoID: videoId, lang: "fr" });
-          actualLang = "fr";
-        } catch (frError) {
-          // If French fails, try English
-          subtitles = await getSubtitles({ videoID: videoId, lang: "en" });
-          actualLang = "en";
-        }
-      } else {
-        // If French was requested and failed, try English
-        subtitles = await getSubtitles({ videoID: videoId, lang: "en" });
-        actualLang = "en";
+      // youtube-transcript library handles language fallback automatically
+      // It will try the requested language and fall back to available ones
+      transcript = await YoutubeTranscript.fetchTranscript(videoId, {
+        lang: requestedLang,
+      });
+    } catch (error: any) {
+      // If specific language fails, try without language constraint
+      try {
+        transcript = await YoutubeTranscript.fetchTranscript(videoId);
+        actualLang = "auto"; // Language was auto-detected
+      } catch (fallbackError: any) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "No transcript available for this video",
+            available: false,
+            fallbackRequired: true
+          },
+          { status: 200 }
+        );
       }
     }
 
-    if (!subtitles || subtitles.length === 0) {
+    if (!transcript || transcript.length === 0) {
       return NextResponse.json(
         {
           success: false,
@@ -67,18 +68,18 @@ export async function POST(request: NextRequest) {
           available: false,
           fallbackRequired: true
         },
-        { status: 200 } // Changed to 200 so client can handle gracefully
+        { status: 200 }
       );
     }
 
-    // Convert subtitles to our format
-    const fullTranscript = subtitles.map((sub: any) => sub.text).join(" ");
+    // Convert transcript to our format
+    const fullTranscript = transcript.map((item: any) => item.text).join(" ");
 
-    // Create chunks with timestamps (similar to our transcribe API)
-    const chunks = subtitles.map((sub: any, index: number) => ({
-      text: sub.text,
-      startTime: Math.floor(sub.start / 1000), // Convert ms to seconds
-      endTime: Math.floor((sub.start + sub.dur) / 1000),
+    // Create chunks with timestamps
+    const chunks = transcript.map((item: any, index: number) => ({
+      text: item.text,
+      startTime: Math.floor(item.offset / 1000), // Convert ms to seconds
+      endTime: Math.floor((item.offset + item.duration) / 1000),
       chunkIndex: index,
     }));
 

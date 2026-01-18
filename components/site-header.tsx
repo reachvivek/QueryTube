@@ -63,6 +63,14 @@ export function SiteHeader() {
             >
               Docs
             </Link>
+            <Link
+              href="/faq"
+              className={`text-sm font-medium transition-colors ${
+                isActive("/faq") ? "text-black" : "text-gray-700 hover:text-black"
+              }`}
+            >
+              FAQ
+            </Link>
             <Link href="/auth/signin">
               <Button variant="ghost" className="text-black hover:bg-gray-100">
                 Sign In
@@ -124,6 +132,15 @@ export function SiteHeader() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Docs
+                </Link>
+                <Link
+                  href="/faq"
+                  className={`text-lg font-medium transition-colors ${
+                    isActive("/faq") ? "text-black" : "text-gray-700 hover:text-red-600"
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  FAQ
                 </Link>
 
                 <div className="h-px bg-gray-200 my-2" />

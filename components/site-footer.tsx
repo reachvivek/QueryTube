@@ -26,6 +26,9 @@ export function SiteFooter() {
             <Link href="/docs" className="hover:text-black transition-colors">
               Docs
             </Link>
+            <Link href="/faq" className="hover:text-black transition-colors">
+              FAQ
+            </Link>
           </div>
         </div>
         <div className="text-center text-sm text-gray-500">
