@@ -4,12 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard,
@@ -26,6 +28,8 @@ import {
   Sun,
   Menu,
   X,
+  User,
+  LogOut,
 } from "lucide-react";
 import { CircleFlag } from "react-circle-flags";
 
@@ -38,32 +42,156 @@ interface DashboardLayoutProps {
 const translations = {
   en: {
     title: "QueryTube",
-    dashboard: "Dashboard",
-    newVideo: "New Video",
-    knowledge: "Knowledge Base",
-    analytics: "Analytics",
-    logs: "Logs",
+    videos: "Videos",
+    overview: "Overview",
+    insights: "Insights",
+    activity: "Activity",
     settings: "Settings",
+    signOut: "Sign Out",
   },
   fr: {
     title: "QueryTube",
-    dashboard: "Tableau de bord",
-    newVideo: "Nouvelle Vidéo",
-    knowledge: "Base de connaissances",
-    analytics: "Analytique",
-    logs: "Journaux",
+    videos: "Vidéos",
+    overview: "Aperçu",
+    insights: "Statistiques",
+    activity: "Activité",
     settings: "Paramètres",
+    signOut: "Se déconnecter",
   },
   hi: {
     title: "QueryTube",
-    dashboard: "डैशबोर्ड",
-    newVideo: "नया वीडियो",
-    knowledge: "ज्ञान आधार",
-    analytics: "विश्लेषण",
-    logs: "लॉग्स",
+    videos: "वीडियो",
+    overview: "सारांश",
+    insights: "अंतर्दृष्टि",
+    activity: "गतिविधि",
     settings: "सेटिंग्स",
+    signOut: "साइन आउट",
   },
 };
+
+export function SidebarProfile({
+  isCollapsed,
+  language
+}: {
+  isCollapsed: boolean;
+  language: "en" | "fr" | "hi";
+}) {
+  const { data: session, isPending } = useSession();
+  const t = translations[language];
+
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = "/";
+  };
+
+  if (isPending) return <div className="text-xs text-gray-400 px-3 py-2">Loading...</div>;
+  if (!session?.user) return null;
+
+  const userEmail = session.user.email || session.user.name || "User";
+  const userInitial = userEmail.charAt(0).toUpperCase();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-gray-100 transition-colors ${
+            isCollapsed ? "justify-center" : ""
+          }`}
+          title={userEmail}
+        >
+          <div className="w-7 h-7 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold shrink-0">
+            {userInitial}
+          </div>
+          {!isCollapsed && (
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {session.user.name || userEmail.split("@")[0]}
+              </p>
+              <p className="text-xs text-gray-500 truncate">{userEmail}</p>
+            </div>
+          )}
+          {!isCollapsed && (
+            <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <div className="px-2 py-1.5">
+          <p className="text-sm font-medium text-gray-900">{session.user.name || userEmail.split("@")[0]}</p>
+          <p className="text-xs text-gray-500 truncate">{userEmail}</p>
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/pages/logs" className="cursor-pointer">
+            <FileText className="w-4 h-4 mr-2" />
+            {t.activity}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/pages/settings" className="cursor-pointer">
+            <Settings className="w-4 h-4 mr-2" />
+            {t.settings}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 cursor-pointer">
+          <LogOut className="w-4 h-4 mr-2" />
+          {t.signOut}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export function UserProfile() {
+  const { data: session, isPending } = useSession();
+
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = "/";
+  };
+
+  if (isPending) return <div className="text-sm text-gray-500">Loading...</div>;
+  if (!session?.user) return null;
+
+  const userEmail = session.user.email || session.user.name || "User";
+  const userInitial = userEmail.charAt(0).toUpperCase();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 min-w-[40px] h-9"
+          aria-label="User menu"
+        >
+          <div className="w-6 h-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-medium">
+            {userInitial}
+          </div>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <div className="px-2 py-1.5">
+          <p className="text-sm font-medium text-gray-900">{session.user.name || "User"}</p>
+          <p className="text-xs text-gray-500 truncate">{userEmail}</p>
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/pages/settings" className="cursor-pointer">
+            <User className="w-4 h-4 mr-2" />
+            Profile Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 cursor-pointer">
+          <LogOut className="w-4 h-4 mr-2" />
+          Sign Out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export function LanguageSwitcher({
   language,
@@ -130,15 +258,17 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const t = translations[language];
 
-  const navItems = [
-    { href: "/", icon: LayoutDashboard, label: t.dashboard },
-    { href: "/knowledge", icon: Database, label: t.knowledge },
-    { href: "/analytics", icon: BarChart3, label: t.analytics },
-    { href: "/logs", icon: FileText, label: t.logs },
-  ];
+  // Consolidated navigation structure - Overview is home
+  const NAV = {
+    main: [
+      { href: "/pages/dashboard", icon: LayoutDashboard, label: t.overview },
+      { href: "/pages/knowledge", icon: Database, label: t.videos },
+      { href: "/pages/analytics", icon: BarChart3, label: t.insights },
+    ],
+  } as const;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Mobile Menu Backdrop */}
       {isMobileMenuOpen && (
         <div
@@ -156,93 +286,92 @@ export default function DashboardLayout({
           lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-50`}
       >
         {/* Logo/Header */}
-        <div className="px-6 py-6 border-b border-gray-200 flex items-center justify-between h-[84px]">
-          {!isCollapsed && (
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-bold tracking-tight leading-none">
-                <span className="text-gray-900">Query</span>
-                <span className="text-red-600">Tube</span>
-              </h1>
-              <p className="text-xs text-gray-500 mt-1.5 font-medium">
-                AI-Powered Video Q&A
-              </p>
-            </div>
-          )}
-          <div className="flex items-center gap-2">
-            {/* Close button for mobile */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="lg:hidden hover:bg-gray-100"
-              aria-label="Close menu"
-            >
-              <X className="w-4 h-4" aria-hidden="true" />
-            </Button>
-            {/* Collapse button for desktop */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="hidden lg:flex hover:bg-gray-100"
-              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {isCollapsed ? (
-                <ChevronRight className="w-4 h-4" aria-hidden="true" />
-              ) : (
-                <ChevronLeft className="w-4 h-4" aria-hidden="true" />
-              )}
-            </Button>
+        <div className="px-4 py-4 border-b border-gray-200 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            {!isCollapsed && (
+              <div className="flex flex-col min-w-0">
+                <h1 className="text-xl font-bold tracking-tight leading-none">
+                  <span className="text-gray-900">Query</span>
+                  <span className="text-red-600">Tube</span>
+                </h1>
+                <p className="text-[10px] text-gray-500 mt-1 font-medium">
+                  AI-Powered Video Q&A
+                </p>
+              </div>
+            )}
+            {isCollapsed && (
+              <div className="w-8 h-8 flex items-center justify-center">
+                <span className="text-lg font-bold">
+                  <span className="text-gray-900">Q</span>
+                  <span className="text-red-600">T</span>
+                </span>
+              </div>
+            )}
           </div>
+          {/* Close button for mobile */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="lg:hidden hover:bg-gray-100 shrink-0 w-8 h-8"
+            aria-label="Close menu"
+          >
+            <X className="w-4 h-4" aria-hidden="true" />
+          </Button>
+          {/* Collapse button for desktop */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="hidden lg:flex hover:bg-gray-100 shrink-0 w-8 h-8"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
+            ) : (
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+            )}
+          </Button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <div className="space-y-2">
-            {navItems.map((item) => {
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          <div className="space-y-0.5">
+            {NAV.main.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
 
               return (
                 <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)}>
-                  <button
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                  <div
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isActive
-                        ? "bg-black text-white"
+                        ? "bg-gray-900 text-white"
                         : "text-gray-700 hover:bg-gray-100"
                     } ${isCollapsed ? "justify-center" : ""}`}
                     title={isCollapsed ? item.label : undefined}
                   >
-                    <Icon className="w-5 h-5 flex-shrink-0" />
-                    {!isCollapsed && (
-                      <span className="font-medium">{item.label}</span>
-                    )}
-                  </button>
+                    <div className="w-5 flex items-center justify-center shrink-0">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    {!isCollapsed && <span>{item.label}</span>}
+                  </div>
                 </Link>
               );
             })}
           </div>
         </nav>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200">
-          <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)}>
-            <button
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition-colors ${
-                isCollapsed ? "justify-center" : ""
-              }`}
-              title={isCollapsed ? t.settings : undefined}
-            >
-              <Settings className="w-5 h-5 flex-shrink-0" />
-              {!isCollapsed && <span className="font-medium">{t.settings}</span>}
-            </button>
-          </Link>
+        {/* Footer - User Profile Only */}
+        <div className="px-3 py-3 border-t border-gray-200 shrink-0">
+          <SidebarProfile isCollapsed={isCollapsed} language={language} />
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto relative lg:ml-0">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <main className="min-h-0 flex-1 overflow-y-auto bg-gray-50">
         {/* Mobile Hamburger - Top Left */}
         <Button
           variant="outline"
@@ -256,6 +385,9 @@ export default function DashboardLayout({
 
         {/* Fixed Controls - Top Right */}
         <div className="fixed top-4 right-4 sm:right-6 z-50 flex items-center gap-3">
+          {/* User Profile */}
+          <UserProfile />
+
           {/* Dark Mode Toggle */}
           <Button
             variant="outline"
@@ -277,8 +409,9 @@ export default function DashboardLayout({
             <LanguageSwitcher language={language} onLanguageChange={onLanguageChange} />
           )}
         </div>
-        {children}
-      </main>
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

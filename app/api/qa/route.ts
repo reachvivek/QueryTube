@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       systemPrompt,
       model,
       provider,
-      topK = 5,
+      topK = 10,
       language = "en"
     } = await request.json();
 
@@ -167,8 +167,11 @@ export async function POST(request: NextRequest) {
     });
 
     const context = chunks
-      .map((chunk, i) => `[${i + 1}] [${chunk.timestamp}] ${chunk.text}`)
-      .join("\n\n");
+      .map((chunk, i) => `
+Segment ${i + 1} [Timestamp: ${chunk.timestamp}] (Relevance: ${(chunk.score * 100).toFixed(1)}%)
+Content: ${chunk.text}
+`)
+      .join("\n---\n");
 
     // Step 4: Generate answer using selected AI provider
     const languageInstructions = {
@@ -178,20 +181,23 @@ export async function POST(request: NextRequest) {
     };
 
     const defaultSystemPrompt =
-      "You are a helpful, friendly AI assistant that answers questions about video content. " +
-      "Use the provided transcript context to give accurate, conversational answers. " +
+      "You are a knowledgeable video content assistant. Your role is to provide detailed, comprehensive answers based on the video transcript segments provided." +
       "\n\nIMPORTANT INSTRUCTIONS:" +
-      "\n1. Be conversational and natural - respond like a friendly human would" +
-      "\n2. ALWAYS reference specific timestamps when mentioning video content (format: [MM:SS])" +
-      "\n3. If multiple relevant moments exist, mention all of them with timestamps" +
-      "\n4. If you cannot find the answer in the context, politely say so" +
-      "\n5. Use phrases like 'At [MM:SS], they discuss...' or 'Around [MM:SS], you'll find...'" +
-      `\n6. ${languageInstructions[language as keyof typeof languageInstructions] || languageInstructions.en} ` +
+      "\n1. Provide DETAILED answers - don't just point to timestamps, explain the content thoroughly" +
+      "\n2. ALWAYS cite specific timestamps using the format [MM:SS] when referencing content" +
+      "\n3. Combine information from multiple segments when they're related to the question" +
+      "\n4. Structure your response clearly - start with a direct answer, then provide supporting details" +
+      "\n5. Quote or paraphrase the actual content from the segments - don't be vague" +
+      "\n6. If multiple segments discuss the same topic, synthesize them into a coherent explanation" +
+      "\n7. Only say you can't find information if NONE of the provided segments are relevant" +
+      `\n8. ${languageInstructions[language as keyof typeof languageInstructions] || languageInstructions.en} ` +
       "Only use a different language if the user explicitly asks." +
-      "\n\nExample: 'At [12:34], Sam explains that AI will transform education. He also mentions this topic again at [45:12] when discussing...'";
+      "\n\nGOOD Example: 'This video discusses AI's impact on education. At [12:34], the speaker explains that AI will enable personalized learning paths for each student, adapting to their pace and style. They elaborate on this at [45:12], describing how AI tutors can provide instant feedback and identify knowledge gaps. The key benefits mentioned include...'" +
+      "\n\nBAD Example: 'Around [00:05], the speaker mentions something about this topic. You might find more information at [00:01].'" +
+      "\n\nRemember: Each segment provided is highly relevant to the question. Use ALL relevant segments to build a complete, detailed answer.";
 
 
-    const userMessage = `Context from video transcript:\n\n${context}\n\nQuestion: ${question}`;
+    const userMessage = `Below are the most relevant segments from the video transcript for answering this question. Each segment includes a timestamp and relevance score.\n\n${context}\n\n---\n\nUser Question: ${question}\n\nProvide a detailed, comprehensive answer using the information from these segments. Cite timestamps for all claims.`;
 
     let answer = "";
 
@@ -210,7 +216,7 @@ export async function POST(request: NextRequest) {
           },
         ],
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 1000,
       });
 
       answer = completion.choices[0]?.message?.content || "";
@@ -218,7 +224,7 @@ export async function POST(request: NextRequest) {
       // Anthropic Claude API
       const completion = await anthropic.messages.create({
         model: aiModel,
-        max_tokens: 500,
+        max_tokens: 1000,
         system: systemPrompt || defaultSystemPrompt,
         messages: [
           {
@@ -245,7 +251,7 @@ export async function POST(request: NextRequest) {
           },
         ],
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 1000,
       });
 
       answer = completion.choices[0]?.message?.content || "";

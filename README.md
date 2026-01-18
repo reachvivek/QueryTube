@@ -53,32 +53,36 @@ QueryTube converts any video (YouTube or uploaded files) into a smart Q&A assist
 ### Video Processing
 - ✅ YouTube URLs (public videos)
 - ✅ Direct file uploads (MP4, MP3, WAV, M4A, WebM, up to 25MB)
-- ✅ Auto language detection
+- ✅ Auto language detection (EN/FR/other)
 - ✅ YouTube captions extraction (instant, free)
-- ✅ AI transcription fallback (when captions unavailable)
+- ✅ Groq Whisper AI transcription fallback (when captions unavailable)
+- ✅ Retry mechanism for re-extracting transcripts
 
 ### Intelligent Features
-- ✅ Semantic embedding generation
-- ✅ Vector-based similarity search
-- ✅ Context-aware Q&A with citations
-- ✅ AI-generated video summaries
+- ✅ Semantic embedding generation (Mistral/OpenAI)
+- ✅ Vector-based similarity search (Pinecone)
+- ✅ Enhanced context-aware Q&A with detailed citations
+- ✅ Structured AI-generated video summaries with key topics
 - ✅ Chat history persistence per video
 - ✅ Session management (resume after refresh)
 - ✅ Duplicate video detection
 
 ### User Experience
+- ✅ Magic link authentication (Better Auth v4)
 - ✅ Clean, intuitive dashboard
-- ✅ Real-time progress tracking
+- ✅ Real-time progress tracking with ETA
 - ✅ Per-video isolated sessions
 - ✅ Custom modal confirmations (no browser alerts)
 - ✅ Direct chat access from dashboard
 - ✅ Complete video deletion (DB + vectors)
+- ✅ Retry button for transcript re-extraction
 
 ### Analytics & Management
 - ✅ Provider tracking (Mistral/OpenAI for embeddings, Groq/OpenAI/Claude for Q&A)
-- ✅ Usage statistics
+- ✅ Usage statistics with real database data
 - ✅ Q&A history per video
 - ✅ Processing status monitoring
+- ✅ Weekly activity charts
 
 ---
 

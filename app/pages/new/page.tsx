@@ -43,6 +43,7 @@ import {
   ChevronDown,
   ChevronUp,
   X,
+  RefreshCw,
 } from "lucide-react";
 
 type Step = "upload" | "process" | "knowledge" | "configure" | "deploy";
@@ -88,7 +89,6 @@ function NewVideoContent() {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('querytube-language');
       const lang = (saved as "en" | "fr" | "hi") || "en";
-      console.log("[Language] Initialized:", lang, saved ? `(from localStorage)` : `(default)`);
       return lang;
     }
     return "en";
@@ -98,7 +98,6 @@ function NewVideoContent() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('querytube-language', language);
-      console.log("[Language] Changed to:", language);
     }
   }, [language]);
 
@@ -120,6 +119,10 @@ function NewVideoContent() {
   const [sessionRestored, setSessionRestored] = useState(false);
   const [showSessionBanner, setShowSessionBanner] = useState(false);
 
+  // Ref to prevent duplicate processing
+  const isProcessingRef = useRef(false);
+  const forceReprocessRef = useRef(false);
+
   // Step 3: Vector DB state
   const [isUploadingVectors, setIsUploadingVectors] = useState(false);
   const [vectorUploadProgress, setVectorUploadProgress] = useState(0);
@@ -127,6 +130,8 @@ function NewVideoContent() {
   const [vectorsUploaded, setVectorsUploaded] = useState(false);
   const [isImprovingTranscript, setIsImprovingTranscript] = useState(false);
   const [transcriptImproved, setTranscriptImproved] = useState(false);
+  const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<number | null>(null);
+  const [processingStartTime, setProcessingStartTime] = useState<number | null>(null);
 
   // Step 4: Chat/QA state
   const [systemPrompt, setSystemPrompt] = useState("");
@@ -224,7 +229,6 @@ function NewVideoContent() {
       if (!editVideoId) return;
 
       try {
-        console.log("[Edit Mode] Loading video:", editVideoId);
         const response = await fetch(`/api/videos/${editVideoId}`);
         const data = await response.json();
 
@@ -283,8 +287,6 @@ function NewVideoContent() {
 
           // Mark this video as the last active video
           localStorage.setItem("youtube-qa-last-video", video.id);
-
-          console.log("[Edit Mode] Video loaded successfully");
         }
       } catch (error) {
         console.error("[Edit Mode] Failed to load video:", error);
@@ -344,7 +346,6 @@ function NewVideoContent() {
                 if (session.transcriptData) setTranscriptData(session.transcriptData);
                 if (session.transcriptSource) setTranscriptSource(session.transcriptSource);
 
-                console.log(`[Session] Restored video ${lastVideoId}:`, session.currentStep);
                 setShowSessionBanner(true);
                 setSessionRestored(true);
                 hideLoading();
@@ -360,7 +361,6 @@ function NewVideoContent() {
               showLoading("Starting fresh...");
 
               setTimeout(() => {
-                console.log("[Session] Starting fresh (user chose to start new)");
                 localStorage.removeItem("youtube-qa-last-video");
                 localStorage.removeItem(sessionKey);
                 setSessionRestored(true);
@@ -372,11 +372,7 @@ function NewVideoContent() {
 
           // Don't set sessionRestored yet - wait for user choice
           return;
-        } else {
-          console.log(`[Session] No saved session found for video ${lastVideoId}`);
         }
-      } else {
-        console.log("[Session] No last active video found");
       }
     } catch (error) {
       console.error("[Session] Failed to restore session:", error);
@@ -408,8 +404,6 @@ function NewVideoContent() {
 
       // Mark this as the last active video
       localStorage.setItem("youtube-qa-last-video", videoId);
-
-      console.log(`[Session] Saved for video ${videoId}`);
     } catch (error) {
       console.error("[Session] Failed to save session:", error);
     }
@@ -431,12 +425,10 @@ function NewVideoContent() {
             const hasVectorIds = video.chunks.some((chunk: any) => chunk.vectorId);
 
             if (hasVectorIds) {
-              console.log("[Knowledge Step] Transcript already processed with vectors");
               setVectorsUploaded(true);
               setVectorUploadStatus("completed");
               setVectorUploadProgress(100);
             } else {
-              console.log("[Knowledge Step] Transcript exists but not vectorized yet");
               setVectorsUploaded(false);
               setVectorUploadStatus("idle");
             }
@@ -456,10 +448,8 @@ function NewVideoContent() {
       if (videoId) {
         const sessionKey = `youtube-qa-session-${videoId}`;
         localStorage.removeItem(sessionKey);
-        console.log(`[Session] Cleared for video ${videoId}`);
       }
       localStorage.removeItem("youtube-qa-last-video");
-      console.log("[Session] Cleared last active video");
     } catch (error) {
       console.error("[Session] Failed to clear session:", error);
     }
@@ -504,7 +494,6 @@ function NewVideoContent() {
         if (data.valid) {
           setVideoInfo(data.video);
           setValidationError(null);
-          console.log("✅ Video validated:", data.video.title);
         } else {
           setVideoInfo(null);
           setValidationError(data.error || "Invalid YouTube URL");
@@ -529,7 +518,13 @@ function NewVideoContent() {
   const processVideo = async () => {
     if (!videoInfo) return;
 
+    // Prevent duplicate processing
+    if (isProcessingRef.current) {
+      return;
+    }
+
     try {
+      isProcessingRef.current = true;
       setIsProcessing(true);
       setProcessingError(null);
 
@@ -568,7 +563,6 @@ function NewVideoContent() {
         // Define function to load existing data
         const loadExistingData = async () => {
           try {
-            console.log(`[LoadExisting] Fetching video data for ${video.id}...`);
             const videoDetailsResponse = await fetch(`/api/videos/${video.id}`);
             const videoDetailsData = await videoDetailsResponse.json();
 
@@ -593,13 +587,10 @@ function NewVideoContent() {
                 setTranscriptData(formattedTranscriptData);
                 setTranscriptSource(existingVideo.transcriptSource);
                 setProcessingStatus("completed");
-                setCurrentStep("knowledge");
+                // Don't auto-navigate - let user review and use retry if needed
                 setIsProcessing(false);
                 closeModal();
-
-                console.log(`[LoadExisting] ✓ Loaded ${existingVideo.chunks.length} chunks from database`);
               } else {
-                console.warn("[LoadExisting] No chunks found in database");
                 setIsProcessing(false);
                 showModal({
                   type: 'warning',
@@ -640,7 +631,6 @@ function NewVideoContent() {
           closeModal();
           setIsProcessing(true);
           setProcessingStatus("fetching-captions");
-          console.log("[Session] User chose to re-process existing video, updating...");
 
           // Continue with the normal processing flow
           const transcriptResponse = await fetch(
@@ -657,7 +647,6 @@ function NewVideoContent() {
           }
 
           const transcriptResult = await transcriptResponse.json();
-          console.log("Transcript result:", transcriptResult);
 
           if (transcriptResult.success) {
             setTranscriptData(transcriptResult);
@@ -689,12 +678,13 @@ function NewVideoContent() {
         };
 
         // Show modal based on video status
-        if (video.status === "completed") {
+        // Skip existing video check if user clicked Retry
+        if (!forceReprocessRef.current && video.status === "completed") {
           // Auto-load existing data instead of asking
-          console.log("[ProcessVideo] Video already processed, loading from database...");
           await loadExistingData();
+          isProcessingRef.current = false;
           return;
-        } else if (video.status === "pending" || video.status === "processing") {
+        } else if (!forceReprocessRef.current && (video.status === "pending" || video.status === "processing")) {
           showModal({
             type: 'info',
             title: `Video is ${video.status}`,
@@ -708,7 +698,7 @@ function NewVideoContent() {
             onAction: reprocessVideo,
             showCancel: true,
           });
-        } else if (video.status === "failed") {
+        } else if (!forceReprocessRef.current && video.status === "failed") {
           showModal({
             type: 'error',
             title: 'Previous Processing Failed',
@@ -722,16 +712,25 @@ function NewVideoContent() {
             onAction: reprocessVideo,
             showCancel: true,
           });
+          isProcessingRef.current = false;
+          return;
         }
 
-        return;
+        // If forceReprocessRef is true, continue with re-processing
+        if (forceReprocessRef.current) {
+          forceReprocessRef.current = false; // Reset the flag
+        } else if (createResult.isExisting) {
+          // Video exists but not in completed/pending/failed status, return early
+          isProcessingRef.current = false;
+          return;
+        }
       }
 
       // Step 2: Process transcript with automatic fallback (captions → Whisper)
       setProcessingStatus("fetching-captions");
 
       const transcriptResponse = await fetch(
-        `/api/process-transcript?videoId=${encodeURIComponent(videoInfo.id)}&url=${encodeURIComponent(youtubeUrl)}&lang=fr`,
+        `/api/process-transcript?videoId=${encodeURIComponent(videoInfo.id)}&url=${encodeURIComponent(youtubeUrl)}`,
         { method: "POST" }
       );
 
@@ -744,8 +743,6 @@ function NewVideoContent() {
       }
 
       const transcriptResult = await transcriptResponse.json();
-
-      console.log("Transcript result:", transcriptResult);
 
       if (transcriptResult.success) {
         // Success! We got the transcript (either from captions or Whisper)
@@ -790,6 +787,7 @@ function NewVideoContent() {
       setProcessingStatus("error");
     } finally {
       setIsProcessing(false);
+      isProcessingRef.current = false;
     }
   };
 
@@ -829,7 +827,6 @@ function NewVideoContent() {
 
     try {
       setIsImprovingTranscript(true);
-      console.log("[Transcript Improvement] Starting improvement process...");
 
       // Process chunks in batches for better performance
       const batchSize = 10;
@@ -875,8 +872,6 @@ function NewVideoContent() {
             improvedChunks[i + idx].text = line.trim();
           }
         });
-
-        console.log(`[Transcript Improvement] Processed batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(improvedChunks.length / batchSize)}`);
       }
 
       // Update transcript data
@@ -892,8 +887,6 @@ function NewVideoContent() {
         title: "Transcript Improved",
         description: "Grammar, spelling, and punctuation have been corrected successfully.",
       });
-
-      console.log("[Transcript Improvement] Completed!");
     } catch (error: any) {
       console.error("[Transcript Improvement] Error:", error);
       showModal({
@@ -926,6 +919,12 @@ function NewVideoContent() {
       setIsUploadingVectors(true);
       setVectorUploadProgress(0);
       setVectorUploadStatus("generating-embeddings");
+      const startTime = Date.now();
+      setProcessingStartTime(startTime);
+
+      // Calculate estimated total time based on chunks (roughly 0.5 seconds per chunk)
+      const totalChunks = transcriptData.chunks?.length || 0;
+      const estimatedTotalSeconds = Math.max(30, totalChunks * 0.5);
 
       // Simulate progress during embedding generation (takes ~30 seconds)
       const progressInterval = setInterval(() => {
@@ -934,7 +933,11 @@ function NewVideoContent() {
             clearInterval(progressInterval);
             return 45;
           }
-          return prev + 3; // Increment by 3% every 2 seconds
+          const newProgress = prev + 3;
+          const elapsed = (Date.now() - startTime) / 1000;
+          const remaining = Math.max(0, estimatedTotalSeconds - elapsed);
+          setEstimatedTimeRemaining(remaining);
+          return newProgress;
         });
       }, 2000);
 
@@ -965,7 +968,11 @@ function NewVideoContent() {
             clearInterval(uploadProgressInterval);
             return 95;
           }
-          return prev + 5; // Increment by 5% every second
+          const newProgress = prev + 5;
+          const elapsed = (Date.now() - startTime) / 1000;
+          const remaining = Math.max(0, estimatedTotalSeconds - elapsed);
+          setEstimatedTimeRemaining(remaining);
+          return newProgress;
         });
       }, 1000);
 
@@ -998,8 +1005,7 @@ function NewVideoContent() {
       setVectorUploadProgress(100);
       setVectorUploadStatus("completed");
       setVectorsUploaded(true);
-
-      console.log(`[Vector Upload] Successfully uploaded ${uploadResult.vectorsUploaded} vectors`);
+      setEstimatedTimeRemaining(null);
 
       // Update videoInfo with generated summary
       if (uploadResult.summary && videoInfo) {
@@ -1007,7 +1013,6 @@ function NewVideoContent() {
           ...videoInfo,
           summary: uploadResult.summary,
         });
-        console.log(`[Vector Upload] AI Summary: "${uploadResult.summary}"`);
       }
 
       // Update video status to completed
@@ -1078,8 +1083,6 @@ function NewVideoContent() {
           ...prev,
           { role: "assistant", content: data.answer },
         ]);
-
-        console.log(`[Q&A] Answer generated in ${data.responseTime}s using ${data.model}`);
       } else {
         setChatMessages((prev) => [
           ...prev,
@@ -1105,10 +1108,10 @@ function NewVideoContent() {
 
   // Start processing when entering Step 2
   useEffect(() => {
-    if (currentStep === "process" && videoInfo && !transcriptData && processingStatus === "idle") {
+    if (currentStep === "process" && videoInfo && !transcriptData && processingStatus === "idle" && !isProcessingRef.current) {
       processVideo();
     }
-  }, [currentStep, videoInfo]);
+  }, [currentStep, videoInfo, transcriptData, processingStatus]);
 
   // Generate summary in Step 4 if missing
   useEffect(() => {
@@ -1119,7 +1122,6 @@ function NewVideoContent() {
       }
 
       try {
-        console.log('[Step 4] Summary missing, generating...');
         const response = await fetch('/api/generate-summary', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1131,10 +1133,8 @@ function NewVideoContent() {
         if (data.success && data.summary) {
           // Update videoInfo with generated summary
           setVideoInfo((prev) => prev ? { ...prev, summary: data.summary } : null);
-          console.log(`[Step 4] Summary ${data.fromCache ? 'loaded' : 'generated'}: "${data.summary}"`);
         } else if (data.error?.includes('No embeddings found')) {
           // No embeddings available, redirect to Step 3
-          console.warn('[Step 4] No embeddings found, redirecting to Step 3');
           showModal({
             type: 'warning',
             title: 'Embeddings Required',
@@ -1147,7 +1147,6 @@ function NewVideoContent() {
           });
         } else if (data.error?.includes('No transcript chunks')) {
           // No transcript available, redirect to Step 2
-          console.warn('[Step 4] No transcript found, redirecting to Step 2');
           showModal({
             type: 'warning',
             title: 'Transcript Required',
@@ -1184,7 +1183,6 @@ function NewVideoContent() {
       try {
         const messages = JSON.parse(savedMessages);
         setChatMessages(messages);
-        console.log(`[Chat] Loaded ${messages.length} messages from history`);
       } catch (error) {
         console.error("[Chat] Failed to load message history:", error);
       }
@@ -1443,11 +1441,6 @@ function NewVideoContent() {
                       </>
                     )}
                   </Button>
-                  {canProceed && !isValidating && (
-                    <p className="text-xs text-gray-500 text-center mt-2">
-                      No signup required • Your video stays private • Takes ~2 minutes
-                    </p>
-                  )}
                   {!canProceed && youtubeUrl && !isValidating && (
                     <p className="text-xs text-gray-500 text-center mt-2">
                       Please enter a valid YouTube URL to continue
@@ -1558,9 +1551,27 @@ function NewVideoContent() {
                 {processingStatus === "completed" && transcriptData && (
                   <Alert className="bg-green-50 border-green-200">
                     <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    <AlertDescription className="text-green-900 text-sm">
-                      ✅ Successfully extracted transcript with {transcriptData?.stats?.totalChunks || transcriptData?.chunks?.length || 0} segments!
-                      {transcriptData?.language && ` Language: ${transcriptData.language.toUpperCase()}`}
+                    <AlertDescription className="text-green-900 text-sm flex items-center justify-between">
+                      <span>
+                        ✅ Successfully extracted transcript with {transcriptData?.stats?.totalChunks || transcriptData?.chunks?.length || 0} segments!
+                        {transcriptData?.language && ` Language: ${transcriptData.language.toUpperCase()}`}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          forceReprocessRef.current = true;
+                          setProcessingStatus("idle");
+                          setTranscriptData(null);
+                          setTranscriptSource(null);
+                          setProcessingError(null);
+                        }}
+                        disabled={isProcessing}
+                        className="ml-4 shrink-0 border-green-300 hover:bg-green-100"
+                      >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Retry
+                      </Button>
                     </AlertDescription>
                   </Alert>
                 )}
@@ -1582,8 +1593,10 @@ function NewVideoContent() {
                     className="flex-1"
                     disabled={isProcessing}
                   >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
                     Back
                   </Button>
+
                   <Button
                     className="flex-1 bg-black text-white hover:bg-gray-800"
                     onClick={() => setCurrentStep("knowledge")}
@@ -1758,9 +1771,21 @@ function NewVideoContent() {
                               {vectorUploadStatus === "uploading-vectors" && "Processing..."}
                               {vectorUploadStatus === "completed" && "Complete!"}
                             </span>
-                            <span className="text-xs text-gray-600">{vectorUploadProgress}%</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-600">{vectorUploadProgress}%</span>
+                              {estimatedTimeRemaining !== null && estimatedTimeRemaining > 0 && (
+                                <span className="text-xs text-gray-500">
+                                  · ~{Math.ceil(estimatedTimeRemaining)}s
+                                </span>
+                              )}
+                            </div>
                           </div>
                           <Progress value={vectorUploadProgress} className="h-2" />
+                          {estimatedTimeRemaining !== null && estimatedTimeRemaining > 0 && (
+                            <p className="text-xs text-gray-500 text-center">
+                              Estimated time remaining: {Math.ceil(estimatedTimeRemaining)} seconds
+                            </p>
+                          )}
                         </div>
                       )}
 

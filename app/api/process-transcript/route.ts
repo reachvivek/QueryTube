@@ -7,13 +7,14 @@ import path from "path";
 
 /**
  * Complete transcript processing with fallback:
- * 1. Try YouTube captions (fast)
- * 2. If fail, download audio + Whisper (slower but works for all videos)
+ * 1. Try YouTube captions (fast) - auto-detects language from available captions
+ * 2. If fail, download audio + Groq Whisper (slower but works for all videos)
  */
 export async function POST(request: NextRequest) {
   const videoId = request.nextUrl.searchParams.get("videoId");
   const youtubeUrl = request.nextUrl.searchParams.get("url");
-  const language = request.nextUrl.searchParams.get("lang") || "fr";
+  const requestedLang = request.nextUrl.searchParams.get("lang") || "en";
+  let detectedLanguage = requestedLang;
 
   if (!videoId || !youtubeUrl) {
     return NextResponse.json(
@@ -26,41 +27,92 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    console.log(`[ProcessTranscript] Starting for video: ${videoId}`);
-
     // ============= STEP 1: Try YouTube Captions (Fast Method) =============
-    console.log("[ProcessTranscript] Step 1: Trying YouTube captions...");
 
+    let subtitles;
     try {
-      const subtitles = await getSubtitles({ videoID: videoId, lang: language });
-
-      if (subtitles && subtitles.length > 0) {
-        console.log(`[ProcessTranscript] ✓ Got captions! ${subtitles.length} segments`);
-
-        // Convert to our format
-        const fullTranscript = subtitles.map((sub: any) => sub.text).join(" ");
-        const chunks = subtitles.map((sub: any, index: number) => ({
-          text: sub.text,
-          startTime: Math.floor(sub.start / 1000),
-          endTime: Math.floor((sub.start + sub.dur) / 1000),
-          chunkIndex: index,
-        }));
-
-        return NextResponse.json({
-          success: true,
-          method: "youtube-captions",
-          transcript: fullTranscript,
-          chunks,
-          language: language,
-          stats: {
-            totalChunks: chunks.length,
-            totalDuration: chunks[chunks.length - 1]?.endTime || 0,
-          },
-        });
+      // Try requested language first
+      subtitles = await getSubtitles({ videoID: videoId, lang: requestedLang });
+      detectedLanguage = requestedLang;
+    } catch (error) {
+      // Fallback to French if not the requested language
+      if (requestedLang !== "fr") {
+        try {
+          subtitles = await getSubtitles({ videoID: videoId, lang: "fr" });
+          detectedLanguage = "fr";
+        } catch (frError) {
+          // Fallback to English
+          subtitles = await getSubtitles({ videoID: videoId, lang: "en" });
+          detectedLanguage = "en";
+        }
+      } else {
+        // If French was requested and failed, try English
+        subtitles = await getSubtitles({ videoID: videoId, lang: "en" });
+        detectedLanguage = "en";
       }
-    } catch (captionError: any) {
-      console.log(`[ProcessTranscript] ✗ Captions failed: ${captionError.message}`);
-      console.log("[ProcessTranscript] Step 2: Falling back to audio download + Whisper...");
+    }
+
+    if (subtitles && subtitles.length > 0) {
+      // Convert to our format - COMBINE captions into larger, meaningful chunks
+      const fullTranscript = subtitles.map((sub: any) => sub.text).join(" ");
+
+      // Combine caption segments into ~90 second chunks for better context
+      const targetChunkDuration = 90; // seconds
+      const combinedChunks: any[] = [];
+      let currentChunk: any = null;
+
+      for (const sub of subtitles) {
+        const subStartSec = Math.floor(sub.start / 1000);
+        const subEndSec = Math.floor((sub.start + sub.dur) / 1000);
+
+        if (!currentChunk) {
+          // Start new chunk
+          currentChunk = {
+            text: sub.text,
+            startTime: subStartSec,
+            endTime: subEndSec,
+          };
+        } else {
+          const chunkDuration = subEndSec - currentChunk.startTime;
+
+          if (chunkDuration < targetChunkDuration) {
+            // Add to current chunk
+            currentChunk.text += " " + sub.text;
+            currentChunk.endTime = subEndSec;
+          } else {
+            // Save current chunk and start new one
+            combinedChunks.push(currentChunk);
+            currentChunk = {
+              text: sub.text,
+              startTime: subStartSec,
+              endTime: subEndSec,
+            };
+          }
+        }
+      }
+
+      // Add final chunk
+      if (currentChunk) {
+        combinedChunks.push(currentChunk);
+      }
+
+      // Add chunk indices
+      const chunks = combinedChunks.map((chunk, index) => ({
+        ...chunk,
+        chunkIndex: index,
+      }));
+
+      return NextResponse.json({
+        success: true,
+        method: "youtube-captions",
+        transcript: fullTranscript,
+        chunks,
+        language: detectedLanguage,
+        stats: {
+          totalChunks: chunks.length,
+          totalDuration: chunks[chunks.length - 1]?.endTime || 0,
+        },
+      });
     }
 
     // ============= STEP 2: Fallback to Audio Download + Whisper =============
@@ -69,25 +121,18 @@ export async function POST(request: NextRequest) {
 
     try {
       // Download audio
-      console.log("[ProcessTranscript] Downloading audio...");
       const downloadResult = await downloadYouTubeAudio(youtubeUrl, "./downloads");
       audioPath = downloadResult.filePath;
 
-      console.log(`[ProcessTranscript] ✓ Downloaded: ${audioPath}`);
-      console.log(`[ProcessTranscript] Size: ${(downloadResult.fileSize / 1024 / 1024).toFixed(2)} MB`);
-
-      // Check file size (Whisper limit is 25MB)
+      // Check file size (Groq Whisper limit is 25MB)
       if (downloadResult.fileSize > 25 * 1024 * 1024) {
         throw new Error(
-          `Audio file too large (${(downloadResult.fileSize / 1024 / 1024).toFixed(2)}MB). Whisper supports up to 25MB.`
+          `Audio file too large (${(downloadResult.fileSize / 1024 / 1024).toFixed(2)}MB). Groq Whisper supports up to 25MB.`
         );
       }
 
-      // Transcribe with Whisper
-      console.log("[ProcessTranscript] Transcribing with Whisper...");
-      const transcription = await transcribeAudio(audioPath, language);
-
-      console.log(`[ProcessTranscript] ✓ Transcribed! Language: ${transcription.language}`);
+      // Transcribe with Groq Whisper (let it auto-detect language)
+      const transcription = await transcribeAudio(audioPath, requestedLang);
 
       // Split into chunks
       const chunks = splitTranscriptIntoChunks(transcription.text, 90, 10);
@@ -96,7 +141,6 @@ export async function POST(request: NextRequest) {
       // Clean up audio file
       if (fs.existsSync(audioPath)) {
         fs.unlinkSync(audioPath);
-        console.log("[ProcessTranscript] ✓ Cleaned up audio file");
       }
 
       return NextResponse.json({

@@ -1,520 +1,481 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import DashboardLayout from "@/components/dashboard-layout";
-import PageHeader from "@/components/page-header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
-  Video,
-  Clock,
-  Database,
-  TrendingUp,
-  Plus,
   Play,
-  MoreVertical,
+  Search,
+  Zap,
   CheckCircle2,
-  Loader2,
-  AlertCircle,
-  LayoutDashboard,
+  ArrowRight,
+  MessageCircle,
+  Clock,
+  Globe,
+  Sparkles,
+  Youtube,
+  Menu,
+  X,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
-interface DashboardStats {
-  totalVideos: number;
-  totalChunks: number;
-  storageUsed: string;
-  questionsAnswered: number;
-}
-
-interface DashboardVideo {
-  id: string;
-  title: string;
-  url: string | null;
-  youtubeId: string | null;
-  status: string;
-  progress: number;
-  duration: string;
-  chunks: number;
-  uploadedAt: string;
-  language: string;
-  errorMessage?: string | null;
-  transcriptSource?: string | null;
-}
-
-export default function Dashboard() {
-  const [language, setLanguage] = useState<"en" | "fr" | "hi">("en");
-  const [stats, setStats] = useState<DashboardStats>({
-    totalVideos: 0,
-    totalChunks: 0,
-    storageUsed: "0 MB",
-    questionsAnswered: 0,
-  });
-  const [videos, setVideos] = useState<DashboardVideo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ videoId: string; title: string } | null>(null);
-
-  // Fetch dashboard data
-  useEffect(() => {
-    async function fetchDashboardData() {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/dashboard");
-
-        if (!response.ok) {
-          throw new Error("Network error");
-        }
-
-        const data = await response.json();
-
-        // Always set stats and videos (API returns fallback data on errors)
-        if (data.stats) {
-          setStats(data.stats);
-        }
-        if (data.videos) {
-          setVideos(data.videos);
-        }
-
-        // Only show error if explicitly provided
-        if (!data.success && data.error) {
-          setError(data.error);
-        } else {
-          setError(null);
-        }
-      } catch (err: any) {
-        // Log technical error to console only
-        console.error("[Dashboard] Failed to fetch data:", err);
-
-        // Show user-friendly message
-        setError("Unable to connect to server. Please check your connection and try again.");
-
-        // Set fallback empty state
-        setStats({
-          totalVideos: 0,
-          totalChunks: 0,
-          storageUsed: "0 MB",
-          questionsAnswered: 0,
-        });
-        setVideos([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDashboardData();
-  }, []);
-
-  // Show delete confirmation modal
-  const handleDeleteVideo = (videoId: string, videoTitle: string) => {
-    setDeleteConfirm({ videoId, title: videoTitle });
-  };
-
-  // Actual delete logic after confirmation
-  const confirmDelete = async () => {
-    if (!deleteConfirm) return;
-
-    const { videoId } = deleteConfirm;
-    setDeleting(videoId);
-    setDeleteConfirm(null);
-
-    try {
-      const response = await fetch(`/api/videos/${videoId}`, {
-        method: "DELETE",
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Remove from local state
-        setVideos(videos.filter((v) => v.id !== videoId));
-        // Refresh stats
-        const statsResponse = await fetch("/api/dashboard");
-        const statsData = await statsResponse.json();
-        if (statsData.success) {
-          setStats(statsData.stats);
-        }
-      } else {
-        console.error("Delete failed:", data.error);
-      }
-    } catch (err: any) {
-      console.error("Delete error:", err);
-    } finally {
-      setDeleting(null);
-    }
-  };
-
-  const translations = {
-    en: {
-      overview: "Overview",
-      videos: "Videos",
-      quickStats: "Quick Stats",
-      totalVideos: "Total Videos",
-      totalChunks: "Knowledge Chunks",
-      storage: "Storage Used",
-      questions: "Questions Answered",
-      recentVideos: "Recent Videos",
-      allVideos: "All Videos",
-      title: "Title",
-      status: "Status",
-      progress: "Progress",
-      chunks: "Chunks",
-      uploaded: "Uploaded",
-      actions: "Actions",
-      newVideo: "Create Knowledge Base",
-      viewDetails: "View Details",
-      delete: "Delete",
-      retry: "Retry",
-    },
-    fr: {
-      overview: "Aperçu",
-      videos: "Vidéos",
-      quickStats: "Statistiques rapides",
-      totalVideos: "Total Vidéos",
-      totalChunks: "Fragments de connaissance",
-      storage: "Stockage utilisé",
-      questions: "Questions répondues",
-      recentVideos: "Vidéos récentes",
-      allVideos: "Toutes les vidéos",
-      title: "Titre",
-      status: "Statut",
-      progress: "Progrès",
-      chunks: "Fragments",
-      uploaded: "Téléchargé",
-      actions: "Actions",
-      newVideo: "Créer une base",
-      viewDetails: "Voir détails",
-      delete: "Supprimer",
-      retry: "Réessayer",
-    },
-    hi: {
-      overview: "अवलोकन",
-      videos: "वीडियो",
-      quickStats: "त्वरित आँकड़े",
-      totalVideos: "कुल वीडियो",
-      totalChunks: "ज्ञान खंड",
-      storage: "उपयोग किया गया भंडारण",
-      questions: "उत्तरित प्रश्न",
-      recentVideos: "हाल के वीडियो",
-      allVideos: "सभी वीडियो",
-      title: "शीर्षक",
-      status: "स्थिति",
-      progress: "प्रगति",
-      chunks: "खंड",
-      uploaded: "अपलोड किया गया",
-      actions: "क्रियाएँ",
-      newVideo: "ज्ञान आधार बनाएं",
-      viewDetails: "विवरण देखें",
-      delete: "हटाएं",
-      retry: "पुनः प्रयास करें",
-    },
-  };
-
-  const t = translations[language];
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "completed":
-        return (
-          <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-            <CheckCircle2 className="w-3 h-3 mr-1" />
-            Completed
-          </Badge>
-        );
-      case "processing":
-        return (
-          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
-            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-            Processing
-          </Badge>
-        );
-      case "failed":
-        return (
-          <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
-            <AlertCircle className="w-3 h-3 mr-1" />
-            Failed
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
-  const router = useRouter();
+export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <DashboardLayout language={language} onLanguageChange={setLanguage}>
-      <PageHeader
-        title={t.overview}
-        description="Manage your educational video knowledge base"
-        icon={LayoutDashboard}
-      />
-
-      <div className="p-4 sm:p-6 lg:p-8 pb-20 sm:pb-8">
-        {/* Quick Stats - Mobile Optimized */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-          <Card className="border-gray-200 hover:border-gray-300 transition-colors">
-            <CardContent className="p-4 sm:pt-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div className="mb-2 sm:mb-0">
-                  <p className="text-xs sm:text-sm text-gray-600 mb-1">{t.totalVideos}</p>
-                  <p className="text-xl sm:text-2xl font-bold text-black">
-                    {loading ? "..." : stats.totalVideos}
-                  </p>
-                </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center self-end sm:self-auto">
-                  <Video className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t.totalChunks}</p>
-                  <p className="text-2xl font-semibold text-black mt-1">
-                    {loading ? "..." : stats.totalChunks}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Database className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t.storage}</p>
-                  <p className="text-2xl font-semibold text-black mt-1">
-                    {loading ? "..." : stats.storageUsed}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Database className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t.questions}</p>
-                  <p className="text-2xl font-semibold text-black mt-1">
-                    {loading ? "..." : stats.questionsAnswered}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-orange-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Videos Table */}
-        <Card className="border-gray-200">
-          <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-            <div className="space-y-1.5">
-              <CardTitle className="text-black">{t.recentVideos}</CardTitle>
-              <CardDescription>
-                Monitor your video processing status and progress
-              </CardDescription>
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo - Always visible */}
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+                <span className="text-black">Query</span>
+                <span className="text-red-600">Tube</span>
+              </h1>
             </div>
-            <Link href="/new?clear=1">
-              <Button className="bg-black text-white hover:bg-gray-800">
-                <Plus className="w-4 h-4 mr-2" />
-                {t.newVideo}
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-4">
+              <Link href="/auth/signin">
+                <Button variant="ghost" className="text-black hover:bg-gray-100">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/auth/signin">
+                <Button className="bg-black text-white hover:bg-gray-800">
+                  Get Started
+                </Button>
+              </Link>
+            </div>
+
+            {/* Mobile Hamburger Menu */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                  aria-label="Open menu"
+                >
+                  <Menu className="w-6 h-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] sm:w-[320px] bg-white">
+                <div className="flex flex-col gap-6 mt-8">
+                  {/* Menu Items */}
+                  <Link
+                    href="/"
+                    className="text-lg font-medium text-black hover:text-red-600 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    href="/about"
+                    className="text-lg font-medium text-black hover:text-red-600 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <Link
+                    href="/pricing"
+                    className="text-lg font-medium text-black hover:text-red-600 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Pricing
+                  </Link>
+                  <Link
+                    href="/docs"
+                    className="text-lg font-medium text-black hover:text-red-600 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Docs
+                  </Link>
+
+                  <div className="h-px bg-gray-200 my-2" />
+
+                  {/* Auth Buttons */}
+                  <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full border-gray-300 text-black">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full bg-black text-white hover:bg-gray-800">
+                      Get Started
+                    </Button>
+                  </Link>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gray-100 text-black text-xs sm:text-sm font-medium mb-6 sm:mb-8">
+            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span>AI-Powered Video Knowledge Base</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black tracking-tight mb-4 sm:mb-6 px-2">
+            You Can't <span className="underline decoration-red-600">Ctrl+F</span> Videos.<br className="hidden sm:block" />
+            <span className="text-gray-600">Until Now.</span>
+          </h1>
+
+          <p className="text-base sm:text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-8 sm:mb-12 px-4">
+            Turn long, unsearchable videos into a knowledge base you can talk to.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-3 px-4">
+            <Link href="/auth/signin" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto bg-black text-white hover:bg-gray-800 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6">
+                Try Searching a Video
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Button>
             </Link>
-          </CardHeader>
-          <CardContent className="p-0 sm:p-6">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="min-w-[200px]">{t.title}</TableHead>
-                    <TableHead className="min-w-[100px]">{t.status}</TableHead>
-                    <TableHead className="hidden sm:table-cell min-w-[120px]">{t.progress}</TableHead>
-                    <TableHead className="hidden md:table-cell">Duration</TableHead>
-                    <TableHead className="hidden lg:table-cell">{t.chunks}</TableHead>
-                    <TableHead className="hidden lg:table-cell">{t.uploaded}</TableHead>
-                    <TableHead className="text-right min-w-[80px]">{t.actions}</TableHead>
-                  </TableRow>
-                </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                      Loading videos...
-                    </TableCell>
-                  </TableRow>
-                ) : error ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-red-500">
-                      <AlertCircle className="w-6 h-6 mx-auto mb-2" />
-                      {error}
-                    </TableCell>
-                  </TableRow>
-                ) : videos.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                      No videos yet. Click "New Video" to get started!
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  videos.map((video) => (
-                    <TableRow key={video.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <Play className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-sm font-medium text-black">
-                              {video.title}
-                            </p>
-                            <p className="text-xs text-gray-500">{video.url}</p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(video.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Progress value={video.progress} className="w-16 h-2" />
-                          <span className="text-xs text-gray-600">
-                            {video.progress}%
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                          <Clock className="w-3 h-3" />
-                          {video.duration}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{video.chunks}</Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-600">
-                        {video.uploadedAt}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link href={`/new?videoId=${video.id}`} className="cursor-pointer">
-                                💬 Chat with Video
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/new?videoId=${video.id}`} className="cursor-pointer">
-                                Edit / Configure
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>{t.viewDetails}</DropdownMenuItem>
-                            {video.status === "failed" && (
-                              <DropdownMenuItem>{t.retry}</DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem
-                              className="text-red-600"
-                              onClick={() => handleDeleteVideo(video.id, video.title)}
-                              disabled={deleting === video.id}
-                            >
-                              {deleting === video.id ? "Deleting..." : t.delete}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+            <Button size="lg" variant="outline" className="w-full sm:w-auto text-black border-gray-300 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6">
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              Watch Demo
+            </Button>
+          </div>
+
+          {/* Demo Section */}
+          <div className="max-w-5xl mx-auto">
+            {/* Example Questions Above Demo */}
+            <div className="mb-6 text-center">
+              <p className="text-sm font-medium text-gray-700 mb-3">Ask anything. Jump to exact moments.</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full">
+                  "What does Sam Altman say about AI regulation?"
+                </span>
+                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full">
+                  "Where do they discuss AGI timelines?"
+                </span>
+                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full">
+                  "Summarize the key risks mentioned"
+                </span>
+              </div>
             </div>
 
-            {videos.length > 0 && (
-              <div className="mt-4 flex justify-center">
-                <Link href="/videos">
-                  <Button variant="outline">{t.allVideos} →</Button>
-                </Link>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Delete Confirmation Modal */}
-      <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Video</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete <strong>"{deleteConfirm?.title}"</strong>?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2 text-sm text-gray-600 py-4">
-            <p>This will permanently remove:</p>
-            <ul className="list-disc pl-6 space-y-1">
-              <li>Video and transcript data</li>
-              <li>All vector embeddings from Pinecone</li>
-              <li>Q&A analytics history</li>
-            </ul>
-            <p className="text-red-600 font-medium mt-4">This action cannot be undone.</p>
+            <Card className="border-2 border-gray-200 shadow-2xl">
+              <CardContent className="p-0">
+                <div className="aspect-video bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-lg flex items-center justify-center">
+                  <div className="text-center text-white p-8">
+                    <Youtube className="w-20 h-20 mx-auto mb-4 opacity-50" />
+                    <p className="text-gray-400 text-sm">Demo Preview</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteConfirm(null)}
-            >
-              Cancel
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 bg-gray-50 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4">
+              Stop Scrubbing. Start Searching.
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              QueryTube makes video content as searchable as text documents
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <Card className="border-gray-200 hover:border-black transition-colors">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
+                  <MessageCircle className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-2">
+                  Natural Language Q&A
+                </h3>
+                <p className="text-gray-600">
+                  Ask questions in plain English. Get accurate answers with exact timestamps from the video.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 2 */}
+            <Card className="border-gray-200 hover:border-black transition-colors">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-2">
+                  Timestamp Precision
+                </h3>
+                <p className="text-gray-600">
+                  Every answer includes clickable timestamps. Jump directly to relevant moments.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 3 */}
+            <Card className="border-gray-200 hover:border-black transition-colors">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
+                  <Zap className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-2">
+                  Instant Processing
+                </h3>
+                <p className="text-gray-600">
+                  Automatic transcription, chunking, and vectorization. Ready to query in minutes.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 4 */}
+            <Card className="border-gray-200 hover:border-black transition-colors">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
+                  <Search className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-2">
+                  Semantic Search
+                </h3>
+                <p className="text-gray-600">
+                  Not just keyword matching. AI understands context and meaning across your entire library.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 5 */}
+            <Card className="border-gray-200 hover:border-black transition-colors">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
+                  <Globe className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-2">
+                  Multi-Language
+                </h3>
+                <p className="text-gray-600">
+                  Full support for English, French, and Hindi. More languages coming soon.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 6 */}
+            <Card className="border-gray-200 hover:border-black transition-colors">
+              <CardContent className="p-8">
+                <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
+                  <CheckCircle2 className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-black mb-2">
+                  Source Grounding
+                </h3>
+                <p className="text-gray-600">
+                  Every answer shows its sources. See exactly which video segments were used.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4">
+              Three Steps to Searchable Video
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                1
+              </div>
+              <h3 className="text-2xl font-bold text-black mb-3">Upload</h3>
+              <p className="text-gray-600">
+                Paste a YouTube URL. We handle transcription, chunking, and embedding.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                2
+              </div>
+              <h3 className="text-2xl font-bold text-black mb-3">Process</h3>
+              <p className="text-gray-600">
+                AI analyzes the content and builds a searchable knowledge base.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                3
+              </div>
+              <h3 className="text-2xl font-bold text-black mb-3">Ask</h3>
+              <p className="text-gray-600">
+                Get instant, timestamped answers to any question about your video.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Use Cases */}
+      <section className="py-24 bg-gray-50 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4">
+              Built for Learners
+            </h2>
+            <p className="text-xl text-gray-600">
+              Perfect for education, research, and content analysis
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card className="border-gray-200">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold text-black mb-4">🎓 Students</h3>
+                <ul className="space-y-3 text-gray-600">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Review lecture content without rewatching hours of video</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Find specific concepts and definitions instantly</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Jump to exact timestamps for exam prep</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-gray-200">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold text-black mb-4">📚 Educators</h3>
+                <ul className="space-y-3 text-gray-600">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Make your video content more accessible</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Answer student questions with precise references</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Share timestamped insights with your class</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-gray-200">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold text-black mb-4">🔬 Researchers</h3>
+                <ul className="space-y-3 text-gray-600">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Analyze interview and lecture content efficiently</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Extract insights from podcast archives</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Build searchable research libraries</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-gray-200">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold text-black mb-4">💼 Professionals</h3>
+                <ul className="space-y-3 text-gray-600">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Search through training videos and webinars</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Find specific information in conference talks</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span>Create knowledge bases from video libraries</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl sm:text-5xl font-bold text-black mb-6">
+            Stop Scrubbing. Start Asking.
+          </h2>
+          <p className="text-xl text-gray-600 mb-12">
+            Turn any video into a knowledge base in minutes
+          </p>
+          <Link href="/auth/signin">
+            <Button size="lg" className="bg-black text-white hover:bg-gray-800 text-lg px-12 py-6">
+              Create Your First Knowledge Base
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={deleting === deleteConfirm?.videoId}
-            >
-              {deleting === deleteConfirm?.videoId ? "Deleting..." : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </DashboardLayout>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-200 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold">
+                <span className="text-black">Query</span>
+                <span className="text-red-600">Tube</span>
+              </h1>
+              <span className="text-gray-400">•</span>
+              <span className="text-sm text-gray-600">Videos hide knowledge. We unlock it.</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-gray-600">
+              <Link href="/" className="hover:text-black transition-colors">
+                Home
+              </Link>
+              <Link href="/about" className="hover:text-black transition-colors">
+                About
+              </Link>
+              <Link href="/pricing" className="hover:text-black transition-colors">
+                Pricing
+              </Link>
+              <Link href="/docs" className="hover:text-black transition-colors">
+                Docs
+              </Link>
+            </div>
+          </div>
+          <div className="mt-8 text-center text-sm text-gray-500">
+            © 2026 QueryTube. Built by Vivek Kumar Singh.
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }

@@ -4,12 +4,12 @@ import { existsSync } from "fs";
 
 /**
  * POST /api/transcribe
- * Transcribes an audio file using OpenAI Whisper API
+ * Transcribes an audio file using Groq's Whisper API
  *
  * Body:
  * {
  *   "filepath": "/path/to/audio.mp3",
- *   "language": "fr" // optional
+ *   "language": "fr" // optional - will auto-detect if not provided
  *   "chunkSize": 90 // optional, in seconds
  *   "overlap": 10 // optional, in seconds
  * }
@@ -27,9 +27,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate API key
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.GROQ_API_KEY) {
       return NextResponse.json(
-        { error: "OPENAI_API_KEY is not configured" },
+        { error: "GROQ_API_KEY is not configured" },
         { status: 500 }
       );
     }
@@ -42,20 +42,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[Transcribe] Starting transcription for: ${filepath}`);
-
-    // Step 1: Transcribe audio using Whisper
+    // Step 1: Transcribe audio using Groq's Whisper
     const transcriptionResult = await transcribeAudio(filepath, language);
     const { text: transcript, language: detectedLanguage, duration } = transcriptionResult;
-
-    console.log(`[Transcribe] Completed in ${duration}s. Language: ${detectedLanguage}`);
-    console.log(`[Transcribe] Transcript length: ${transcript.length} characters`);
 
     // Step 2: Split transcript into chunks
     const textChunks = splitTranscriptIntoChunks(transcript, chunkSize, overlap);
     const chunksWithTimestamps = addTimestampsToChunks(textChunks, chunkSize);
-
-    console.log(`[Transcribe] Created ${textChunks.length} chunks`);
 
     return NextResponse.json({
       success: true,
@@ -72,17 +65,17 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error("[Transcribe] Error:", error);
+    console.error("[Groq Transcribe] Error:", error);
 
     // Handle specific Whisper API errors
     let errorMessage = "Failed to transcribe audio";
 
     if (error.message.includes("File too large")) {
-      errorMessage = "Audio file is too large (max 25MB for Whisper API)";
+      errorMessage = "Audio file is too large (max 25MB for Groq Whisper)";
     } else if (error.message.includes("Invalid file format")) {
       errorMessage = "Unsupported audio format";
     } else if (error.message.includes("API key")) {
-      errorMessage = "OpenAI API key is invalid or missing";
+      errorMessage = "Groq API key is invalid or missing";
     }
 
     return NextResponse.json(

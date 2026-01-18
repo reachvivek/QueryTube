@@ -1,12 +1,12 @@
-import OpenAI from "openai";
+import Groq from "groq-sdk";
 import fs from "fs";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 /**
- * Transcribes an audio file using OpenAI Whisper API
+ * Transcribes an audio file using Groq's Whisper implementation
  * @param audioFilePath - Path to the audio file
  * @param language - Language code (optional, auto-detects if not provided)
  * @returns Transcription text and detected language
@@ -16,46 +16,43 @@ export async function transcribeAudio(
   language?: string
 ): Promise<{ text: string; language: string; duration: number }> {
   try {
-    console.log(`Starting transcription for: ${audioFilePath}`);
-
     // Check if file exists
     if (!fs.existsSync(audioFilePath)) {
       throw new Error(`Audio file not found: ${audioFilePath}`);
     }
 
-    // Get file size (Whisper API has 25MB limit)
+    // Get file size (Groq Whisper has 25MB limit)
     const stats = fs.statSync(audioFilePath);
     const fileSizeMB = stats.size / (1024 * 1024);
 
     if (fileSizeMB > 25) {
       throw new Error(
-        `File too large (${fileSizeMB.toFixed(2)}MB). Whisper API supports files up to 25MB.`
+        `File too large (${fileSizeMB.toFixed(2)}MB). Groq Whisper supports files up to 25MB.`
       );
     }
 
     const startTime = Date.now();
 
-    // Create transcription
-    const transcription = await openai.audio.transcriptions.create({
+    // Create transcription using Groq's Whisper
+    const transcription = await groq.audio.transcriptions.create({
       file: fs.createReadStream(audioFilePath),
-      model: "whisper-1",
-      language: language, // Optional: 'fr' for French, auto-detects if not provided
-      response_format: "verbose_json", // Get detailed response with timestamps
-      timestamp_granularities: ["segment"], // Get segment-level timestamps
-    });
+      model: "whisper-large-v3-turbo", // Groq's fastest Whisper model
+      language: language, // Optional: 'fr' for French, 'en' for English, auto-detects if not provided
+      response_format: "verbose_json", // Get detailed response with language detection
+    }) as any; // Groq SDK types don't include language field yet
 
     const duration = (Date.now() - startTime) / 1000;
 
-    console.log(`Transcription complete in ${duration}s`);
-    console.log(`Detected language: ${transcription.language}`);
+    // Extract detected language from response
+    const detectedLanguage = transcription.language || language || "unknown";
 
     return {
       text: transcription.text,
-      language: transcription.language || language || "unknown",
+      language: detectedLanguage,
       duration,
     };
   } catch (error: any) {
-    console.error("Transcription error:", error);
+    console.error("[Groq Whisper] Transcription error:", error);
     throw new Error(`Failed to transcribe audio: ${error.message}`);
   }
 }
@@ -88,7 +85,6 @@ export function splitTranscriptIntoChunks(
     }
   }
 
-  console.log(`Split transcript into ${chunks.length} chunks`);
   return chunks;
 }
 

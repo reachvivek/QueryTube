@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
-    // Get all videos with their chunk counts
+    // Get current user from session
+    const user = await getCurrentUser();
+    if (!user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    // Get all videos for this user with their chunk counts
     const videos = await prisma.video.findMany({
+      where: {
+        userId: user.id,
+      },
       include: {
         chunks: true,
         analytics: true,
@@ -15,13 +28,30 @@ export async function GET(request: NextRequest) {
       take: 10, // Get latest 10 videos for dashboard
     });
 
-    // Calculate statistics
-    const totalVideos = await prisma.video.count();
-    const totalChunks = await prisma.chunk.count();
-    const totalQuestions = await prisma.analytics.count();
+    // Calculate statistics for this user only
+    const totalVideos = await prisma.video.count({
+      where: { userId: user.id },
+    });
+    const totalChunks = await prisma.chunk.count({
+      where: {
+        video: {
+          userId: user.id,
+        },
+      },
+    });
+    const totalQuestions = await prisma.analytics.count({
+      where: {
+        video: {
+          userId: user.id,
+        },
+      },
+    });
 
-    // Calculate storage (sum of audio file sizes)
+    // Calculate storage (sum of audio file sizes) for this user only
     const storageResult = await prisma.video.aggregate({
+      where: {
+        userId: user.id,
+      },
       _sum: {
         audioFileSize: true,
       },

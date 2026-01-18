@@ -32,30 +32,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`Fetching transcript for video: ${videoId}`);
-
     // Try to get transcript in specified language or auto-detect
-    const lang = language || "en"; // Default to English, but will try other languages if not available
+    const requestedLang = language || "en"; // Default to English, but will try other languages if not available
+    let actualLang = requestedLang; // Track which language actually succeeded
 
     let subtitles;
     try {
       // Try the specified language first
-      subtitles = await getSubtitles({ videoID: videoId, lang });
+      subtitles = await getSubtitles({ videoID: videoId, lang: requestedLang });
+      actualLang = requestedLang;
     } catch (error) {
       // If specified language fails, try French
-      if (lang !== "fr") {
+      if (requestedLang !== "fr") {
         try {
-          console.log(`Language ${lang} not available, trying French...`);
           subtitles = await getSubtitles({ videoID: videoId, lang: "fr" });
+          actualLang = "fr";
         } catch (frError) {
           // If French fails, try English
-          console.log("French not available, trying English...");
           subtitles = await getSubtitles({ videoID: videoId, lang: "en" });
+          actualLang = "en";
         }
       } else {
         // If French was requested and failed, try English
-        console.log("French not available, trying English...");
         subtitles = await getSubtitles({ videoID: videoId, lang: "en" });
+        actualLang = "en";
       }
     }
 
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       available: true,
       transcript: fullTranscript,
       chunks,
-      language: lang,
+      language: actualLang,
       source: "youtube-captions",
       stats: {
         totalChunks: chunks.length,

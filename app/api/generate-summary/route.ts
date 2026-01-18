@@ -82,15 +82,24 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: 'You are a helpful assistant. Analyze the video transcript and provide a comprehensive 2-3 sentence summary that captures the main topic, key points discussed, and overall theme.',
+          content: 'You are a professional content summarizer. Create detailed, structured summaries for video content.' +
+            '\n\nYour summary MUST follow this structure:' +
+            '\n\n**Overview:** (1-2 sentences covering the main topic)' +
+            '\n\n**Key Topics:**' +
+            '\n• Topic 1: [Brief description]' +
+            '\n• Topic 2: [Brief description]' +
+            '\n• Topic 3: [Brief description]' +
+            '\n(Include 3-5 key topics)' +
+            '\n\n**Main Takeaways:** (1-2 sentences with conclusions or actionable insights)' +
+            '\n\nUse markdown formatting. Be specific and informative.',
         },
         {
           role: 'user',
-          content: `Summarize what this video is about based on the transcript:\n\n${contextText}`,
+          content: `Analyze this video transcript and provide a detailed, structured summary:\n\n${contextText}`,
         },
       ],
       temperature: 0.7,
-      max_tokens: 200,
+      max_tokens: 600,
     });
 
     const summary = completion.choices[0]?.message?.content?.trim() || '';
