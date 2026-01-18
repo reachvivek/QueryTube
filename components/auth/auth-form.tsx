@@ -49,43 +49,53 @@ export function AuthForm({ mode, onModeSwitch }: AuthFormProps) {
       {/* Primary CTA: Magic Link */}
       <Button
         type="button"
-        className="w-full h-10 bg-black text-white hover:bg-gray-800 text-sm font-medium"
+        className="w-full h-12 sm:h-11 bg-black text-white hover:bg-gray-800 active:scale-[0.98] text-base sm:text-sm font-medium shadow-sm transition-transform"
         onClick={handleMagicLink}
         disabled={isMagicLinkLoading}
       >
         {isMagicLinkLoading ? (
           <>
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 mr-2 animate-spin" />
             Sending magic link...
           </>
         ) : (
           <>
-            <Mail className="w-4 h-4 mr-2" />
-            Continue with Magic Link
+            <Mail className="w-5 h-5 sm:w-4 sm:h-4 mr-2" />
+            Continue with Email
           </>
         )}
       </Button>
 
+      {/* What happens next */}
+      <div className="mt-3 px-1">
+        <p className="text-xs text-center text-gray-500 leading-relaxed">
+          We'll send you a magic link to sign in.
+          <br className="sm:hidden" />
+          <span className="hidden sm:inline"> </span>
+          No password required.
+        </p>
+      </div>
+
       {/* Divider */}
-      <div className="relative my-4">
+      <div className="relative my-5 sm:my-4">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-200"></div>
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="px-2 bg-white text-gray-500">
-            Or {isSignup ? "sign up" : "sign in"} with email
+          <span className="px-3 bg-white text-gray-500">
+            Or {isSignup ? "sign up" : "sign in"} with password
           </span>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-3">
         {/* Email Field */}
-        <div className="space-y-1">
-          <Label htmlFor="email" className="text-xs font-medium text-black">
-            Email
+        <div className="space-y-1.5">
+          <Label htmlFor="email" className="text-sm sm:text-xs font-medium text-black">
+            Email address
           </Label>
           <div className="relative">
-            <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               id="email"
               type="email"
@@ -93,26 +103,26 @@ export function AuthForm({ mode, onModeSwitch }: AuthFormProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="pl-9 h-9 text-sm border-gray-300 focus:border-black focus:ring-black"
+              className="pl-10 h-11 sm:h-10 text-base sm:text-sm border-gray-300 focus:border-black focus:ring-black rounded-lg"
               aria-label="Email address"
             />
           </div>
         </div>
 
         {/* Password Field */}
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-xs font-medium text-black">
+            <Label htmlFor="password" className="text-sm sm:text-xs font-medium text-black">
               Password
             </Label>
             {!isSignup && (
-              <Link href="/forgot-password" className="text-[10px] text-gray-600 hover:text-black">
+              <Link href="/forgot-password" className="text-xs text-gray-600 hover:text-black active:text-black touch-manipulation">
                 Forgot password?
               </Link>
             )}
           </div>
           <div className="relative">
-            <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               id="password"
               type="password"
@@ -121,12 +131,12 @@ export function AuthForm({ mode, onModeSwitch }: AuthFormProps) {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              className="pl-9 h-9 text-sm border-gray-300 focus:border-black focus:ring-black"
+              className="pl-10 h-11 sm:h-10 text-base sm:text-sm border-gray-300 focus:border-black focus:ring-black rounded-lg"
               aria-label="Password"
             />
           </div>
           {isSignup && (
-            <p className="text-[10px] text-gray-500 mt-0.5">
+            <p className="text-xs sm:text-[10px] text-gray-500 mt-1">
               Must be at least 8 characters
             </p>
           )}
@@ -136,11 +146,11 @@ export function AuthForm({ mode, onModeSwitch }: AuthFormProps) {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-10 bg-black text-white hover:bg-gray-800 text-sm font-medium mt-4"
+          className="w-full h-12 sm:h-11 bg-black text-white hover:bg-gray-800 active:scale-[0.98] text-base sm:text-sm font-medium mt-5 sm:mt-4 shadow-sm transition-transform"
         >
           {isLoading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 mr-2 animate-spin" />
               {isSignup ? "Creating account..." : "Signing in..."}
             </>
           ) : isSignup ? (
@@ -152,41 +162,41 @@ export function AuthForm({ mode, onModeSwitch }: AuthFormProps) {
 
         {/* Reassurance (Signup only) */}
         {isSignup && (
-          <p className="text-[10px] text-gray-500 text-center mt-1.5">
-            No credit card required • Cancel anytime
+          <p className="text-xs sm:text-[10px] text-gray-500 text-center mt-2 sm:mt-1.5">
+            Free to try • No credit card required
           </p>
         )}
       </form>
 
       {/* Terms (Signup only) */}
       {isSignup && (
-        <p className="text-[10px] text-center text-gray-500 mt-4">
+        <p className="text-xs sm:text-[10px] text-center text-gray-500 mt-5 sm:mt-4 leading-relaxed">
           By creating an account, you agree to our{" "}
-          <Link href="/terms" className="text-black underline hover:text-gray-700">
+          <Link href="/terms" className="text-black underline hover:text-gray-700 active:text-black touch-manipulation">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="text-black underline hover:text-gray-700">
+          <Link href="/privacy" className="text-black underline hover:text-gray-700 active:text-black touch-manipulation">
             Privacy Policy
           </Link>
         </p>
       )}
 
       {/* Mode Switch Link */}
-      <div className="flex items-center justify-center gap-1 text-xs text-gray-600 mt-4">
+      <div className="flex items-center justify-center gap-1.5 text-sm sm:text-xs text-gray-600 mt-5 sm:mt-4">
         <span>{isSignup ? "Already have an account?" : "Don't have an account?"}</span>
         <button
           type="button"
           onClick={onModeSwitch}
-          className="text-black font-medium hover:underline"
+          className="text-black font-medium hover:underline active:text-gray-700 touch-manipulation min-h-[44px] sm:min-h-0 flex items-center"
         >
           {isSignup ? "Sign in" : "Sign up for free"}
         </button>
       </div>
 
       {/* Trust Badge */}
-      <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-        <p className="text-[10px] text-gray-500">
+      <div className="mt-5 sm:mt-4 pt-4 border-t border-gray-100 text-center">
+        <p className="text-xs sm:text-[10px] text-gray-500 leading-relaxed">
           {isSignup
             ? "Used for lectures, podcasts, and long-form interviews"
             : "🔒 Secure authentication • No credit card required"}
@@ -194,9 +204,9 @@ export function AuthForm({ mode, onModeSwitch }: AuthFormProps) {
       </div>
 
       {/* Footer */}
-      <div className="mt-2 text-center">
-        <p className="text-[10px] text-gray-400">
-          © 2026 QueryTube. Built by Vivek Kumar Singh.
+      <div className="mt-3 sm:mt-2 text-center">
+        <p className="text-xs sm:text-[10px] text-gray-400">
+          © 2026 QueryTube
         </p>
       </div>
     </>
