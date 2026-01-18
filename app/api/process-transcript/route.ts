@@ -73,14 +73,16 @@ export async function POST(request: NextRequest) {
             endTime: subEndSec,
           };
         } else {
-          const chunkDuration = subEndSec - currentChunk.startTime;
+          // Calculate how long this chunk would be if we add this subtitle
+          const potentialEndTime = subEndSec;
+          const potentialDuration = potentialEndTime - currentChunk.startTime;
 
-          if (chunkDuration < targetChunkDuration) {
-            // Add to current chunk
+          if (potentialDuration <= targetChunkDuration) {
+            // Still under limit, add to current chunk
             currentChunk.text += " " + sub.text;
             currentChunk.endTime = subEndSec;
           } else {
-            // Save current chunk and start new one
+            // Would exceed limit, save current chunk and start new one
             combinedChunks.push(currentChunk);
             currentChunk = {
               text: sub.text,
@@ -101,6 +103,12 @@ export async function POST(request: NextRequest) {
         ...chunk,
         chunkIndex: index,
       }));
+
+      // Debug logging
+      console.log(`[ProcessTranscript] Combined ${subtitles.length} captions into ${chunks.length} chunks`);
+      console.log(`[ProcessTranscript] First chunk: ${chunks[0]?.startTime}s - ${chunks[0]?.endTime}s (${chunks[0]?.text?.substring(0, 100)}...)`);
+      console.log(`[ProcessTranscript] Last chunk: ${chunks[chunks.length-1]?.startTime}s - ${chunks[chunks.length-1]?.endTime}s`);
+      console.log(`[ProcessTranscript] Sample subtitle times: start=${subtitles[0]?.start}, dur=${subtitles[0]?.dur}`);
 
       return NextResponse.json({
         success: true,
