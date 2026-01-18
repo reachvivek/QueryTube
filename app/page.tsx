@@ -233,101 +233,101 @@ export default function LandingPage() {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
-            <Card className="border-gray-200 hover:border-blue-200 hover:shadow-lg transition-all">
-              <CardContent className="p-6 sm:p-7">
+            <Card className="border-gray-200 hover:border-blue-200 hover:shadow-lg transition-all h-full">
+              <CardContent className="p-6 sm:p-7 flex flex-col h-full">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <GraduationCap className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-black">Students</h3>
+                  <h3 className="text-xl font-bold text-black">Students</h3>
                 </div>
-                <ul className="space-y-3 text-gray-600">
+                <ul className="space-y-3 text-gray-600 flex-1">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-base leading-relaxed">Find exam answers in 10 seconds instead of rewatching 2 hours</span>
+                    <span className="text-sm sm:text-base leading-relaxed">Find exam answers in 10 seconds instead of rewatching 2 hours</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-base leading-relaxed">Jump to exact concept explanations with timestamps</span>
+                    <span className="text-sm sm:text-base leading-relaxed">Jump to exact concept explanations with timestamps</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-base leading-relaxed">Turn lecture recordings into searchable study guides</span>
+                    <span className="text-sm sm:text-base leading-relaxed">Turn lecture recordings into searchable study guides</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
-            <Card className="border-gray-200 hover:border-green-200 hover:shadow-lg transition-all">
-              <CardContent className="p-6 sm:p-7">
+            <Card className="border-gray-200 hover:border-green-200 hover:shadow-lg transition-all h-full">
+              <CardContent className="p-6 sm:p-7 flex flex-col h-full">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <BookOpen className="w-6 h-6 text-green-600" />
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-black">Educators</h3>
+                  <h3 className="text-xl font-bold text-black">Educators</h3>
                 </div>
-                <ul className="space-y-3 text-gray-600">
+                <ul className="space-y-3 text-gray-600 flex-1">
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-base leading-relaxed">Answer student questions with exact timestamps</span>
+                    <span className="text-sm sm:text-base leading-relaxed">Answer student questions with exact timestamps</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-base leading-relaxed">Turn recorded lectures into searchable resources</span>
+                    <span className="text-sm sm:text-base leading-relaxed">Turn recorded lectures into searchable resources</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Create study guides automatically from video content</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base leading-relaxed">Create study guides automatically from video content</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
-            <Card className="border-gray-200">
-              <CardContent className="p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Microscope className="w-5 h-5 text-purple-600" />
+            <Card className="border-gray-200 hover:border-purple-200 hover:shadow-lg transition-all h-full">
+              <CardContent className="p-6 sm:p-7 flex flex-col h-full">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Microscope className="w-6 h-6 text-purple-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-black">Researchers</h3>
+                  <h3 className="text-xl font-bold text-black">Researchers</h3>
                 </div>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Search 50 interviews like one document</span>
+                <ul className="space-y-3 text-gray-600 flex-1">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base leading-relaxed">Search 50 interviews like one document</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Extract themes and patterns across video archives</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base leading-relaxed">Extract themes and patterns across video archives</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Find exact quotes with citations in seconds</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base leading-relaxed">Find exact quotes with citations in seconds</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
-            <Card className="border-gray-200">
-              <CardContent className="p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-orange-600" />
+            <Card className="border-gray-200 hover:border-orange-200 hover:shadow-lg transition-all h-full">
+              <CardContent className="p-6 sm:p-7 flex flex-col h-full">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Briefcase className="w-6 h-6 text-orange-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-black">Professionals</h3>
+                  <h3 className="text-xl font-bold text-black">Professionals</h3>
                 </div>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Turn training videos into searchable knowledge bases</span>
+                <ul className="space-y-3 text-gray-600 flex-1">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base leading-relaxed">Turn training videos into searchable knowledge bases</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Find answers in webinars without watching them again</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base leading-relaxed">Find answers in webinars without watching them again</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Search conference talks like text documents</span>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base leading-relaxed">Search conference talks like text documents</span>
                   </li>
                 </ul>
               </CardContent>
