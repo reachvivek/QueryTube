@@ -1,8 +1,9 @@
 # 🚀 Deploy to Vercel in 10 Minutes
 
-## ✅ No Database Changes Needed!
-- **Local Dev**: Keep using SQLite (file:./dev.db)
-- **Production**: Vercel automatically provisions PostgreSQL
+## ✅ Database Setup - PostgreSQL
+- **Current Setup**: Using Aiven PostgreSQL for both local and production
+- **Connection**: Already configured in .env.local and .env.production
+- **Note**: You'll add the DATABASE_URL to Vercel environment variables
 
 ---
 
@@ -64,14 +65,14 @@ DEFAULT_AI_PROVIDER=groq
 DEFAULT_MODEL=llama-3.3-70b-versatile
 ```
 
----
+### 🗄️ DATABASE (REQUIRED)
 
-## Step 4: Setup Vercel Postgres
+```env
+# Aiven PostgreSQL - Copy from .env.production file
+DATABASE_URL=postgresql://avnadmin:your-password@querytube-querytube.j.aivencloud.com:10028/defaultdb
+```
 
-1. In Vercel Dashboard → **Storage** → **Create Database**
-2. Choose **Postgres**
-3. Click **Create** (free tier available)
-4. Vercel auto-sets `DATABASE_URL` environment variable
+**Note**: Remove the `?sslmode=require` parameter if present. SSL is handled in the code.
 
 ---
 
