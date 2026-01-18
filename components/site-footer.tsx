@@ -14,18 +14,21 @@ export function SiteFooter() {
           <p className="text-sm text-gray-700 font-medium mb-1">
             Videos hide knowledge. We unlock it.
           </p>
-          <p className="text-xs text-gray-600 mb-4">
+          <p className="text-xs text-gray-600 mb-5">
             Timestamp-grounded answers. No hallucinations.
           </p>
+
+          {/* Subtle divider before CTA */}
+          <div className="w-12 h-px bg-gradient-to-r from-gray-300 to-transparent mb-4" />
 
           {/* Footer CTA - More compact on mobile */}
           <Link
             href="/auth/signin"
-            className="inline-flex items-center gap-2 text-sm font-medium text-black hover:text-gray-700 hover:underline decoration-2 underline-offset-4 transition-all group"
+            className="inline-flex items-center gap-2 text-sm font-medium text-black hover:text-gray-700 transition-all group"
           >
-            <span className="hidden sm:inline">Start asking smarter questions from videos</span>
-            <span className="sm:hidden">Start asking smarter questions</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+            <span className="hidden sm:inline group-hover:underline decoration-2 underline-offset-4 transition-all">Start asking smarter questions from videos</span>
+            <span className="sm:hidden group-hover:underline decoration-2 underline-offset-4 transition-all">Start asking smarter questions</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-all duration-300 ease-out" />
           </Link>
         </div>
 
@@ -75,9 +78,9 @@ export function SiteFooter() {
             </ul>
           </div>
 
-          {/* Legal Column - Compact */}
+          {/* Legal Column - Compact and de-emphasized */}
           <div className="col-span-2 sm:col-span-1">
-            <h3 className="text-sm font-semibold text-black mb-3">Legal</h3>
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Legal</h3>
             <ul className="flex sm:flex-col gap-4 sm:gap-2 sm:space-y-0">
               <li>
                 <Link href="/privacy" className="text-sm text-gray-600 hover:text-black transition-colors">
