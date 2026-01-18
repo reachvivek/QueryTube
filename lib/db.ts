@@ -1,19 +1,22 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import path from "path";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Create SQLite adapter for Prisma 7
-// Adapter expects { url: string } as first parameter
-const dbPath = path.resolve(process.cwd(), "dev.db");
-const adapter = new PrismaBetterSqlite3({
-  url: `file:${dbPath}`
+// Create PostgreSQL connection pool with SSL configuration for Aiven
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL as string,
+  ssl: {
+    rejectUnauthorized: false // Handle self-signed certificates from cloud providers
+  }
 });
 
-console.log("[Prisma] Database path:", dbPath);
+// Create PostgreSQL adapter for Prisma 7
+const adapter = new PrismaPg(pool);
 
 export const prisma =
   globalForPrisma.prisma ??
