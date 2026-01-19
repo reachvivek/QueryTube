@@ -381,7 +381,7 @@ export default function Dashboard() {
                   {/* Trust Signal */}
                   <div className="mt-6 sm:mt-8 flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-500">
                     <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    <span>Powered by GPT-4 & RAG technology</span>
+                    <span>Powered by Groq, Mistral AI & Pinecone</span>
                   </div>
                 </div>
               </CardContent>
