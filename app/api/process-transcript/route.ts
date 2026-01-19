@@ -32,16 +32,31 @@ export async function POST(request: NextRequest) {
     console.log(`[ProcessTranscript] Step 1: Trying YouTube captions for video ${videoId}`);
 
     let transcript;
-    const languagesToTry = [requestedLang, "en", "hi", "es", "fr", "de", "pt", "ar", "ja", "ko"];
+    // Try multiple languages and variants in order
+    const languagesToTry = [
+      requestedLang,
+      "en", "en-GB", "en-US", "en-CA", "en-AU", // English variants
+      "hi",
+      "es", "es-ES", "es-MX", // Spanish variants
+      "fr", "fr-FR", "fr-CA", // French variants
+      "de", "pt", "pt-BR", "ar", "ja", "ko", "zh", "zh-CN", "zh-TW"
+    ];
 
     // Try multiple languages in order
     for (const lang of languagesToTry) {
       try {
         console.log(`[ProcessTranscript] Attempting captions in language: ${lang}`);
-        transcript = await YoutubeTranscript.fetchTranscript(videoId, { lang });
-        detectedLanguage = lang;
-        console.log(`[ProcessTranscript] ✅ Successfully fetched ${lang} captions (${transcript.length} segments)`);
-        break;
+        const fetchedTranscript = await YoutubeTranscript.fetchTranscript(videoId, { lang });
+
+        // Check if transcript has actual content (not empty)
+        if (fetchedTranscript && fetchedTranscript.length > 0) {
+          transcript = fetchedTranscript;
+          detectedLanguage = lang;
+          console.log(`[ProcessTranscript] ✅ Successfully fetched ${lang} captions (${transcript.length} segments)`);
+          break;
+        } else {
+          console.log(`[ProcessTranscript] ⚠️  ${lang} captions exist but are empty (0 segments), trying next language...`);
+        }
       } catch (error: any) {
         console.log(`[ProcessTranscript] ❌ ${lang} captions not available: ${error.message}`);
       }
@@ -51,14 +66,23 @@ export async function POST(request: NextRequest) {
     if (!transcript) {
       try {
         console.log(`[ProcessTranscript] Attempting auto-detect captions (no language specified)`);
-        transcript = await YoutubeTranscript.fetchTranscript(videoId);
-        detectedLanguage = "auto";
-        console.log(`[ProcessTranscript] ✅ Successfully fetched auto-detect captions (${transcript.length} segments)`);
+        const autoTranscript = await YoutubeTranscript.fetchTranscript(videoId);
+
+        if (autoTranscript && autoTranscript.length > 0) {
+          transcript = autoTranscript;
+          detectedLanguage = "auto";
+          console.log(`[ProcessTranscript] ✅ Successfully fetched auto-detect captions (${transcript.length} segments)`);
+        } else {
+          console.log(`[ProcessTranscript] ⚠️  Auto-detect captions exist but are empty (0 segments)`);
+        }
       } catch (fallbackError: any) {
         console.log(`[ProcessTranscript] ❌ Auto-detect captions failed: ${fallbackError.message}`);
-        console.log(`[ProcessTranscript] No captions available, will try Whisper next`);
-        transcript = null;
       }
+    }
+
+    // Final check: if we still don't have captions, log and proceed to Whisper
+    if (!transcript || transcript.length === 0) {
+      console.log(`[ProcessTranscript] No valid captions found after trying all languages, will try Whisper next`);
     }
 
     if (transcript && transcript.length > 0) {
