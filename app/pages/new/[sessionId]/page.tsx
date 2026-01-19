@@ -1570,6 +1570,8 @@ function NewVideoContent() {
                         variant="outline"
                         size="sm"
                         onClick={() => {
+                          if (isProcessing) return; // Prevent double-click during processing
+
                           forceReprocessRef.current = true;
                           isProcessingRef.current = false;
                           setProcessingStatus("idle");
@@ -1579,10 +1581,10 @@ function NewVideoContent() {
                           // Directly trigger reprocessing
                           processVideo();
                         }}
-                        disabled={isProcessing}
-                        className="ml-4 shrink-0 border-green-300 hover:bg-green-100"
+                        disabled={false}
+                        className={`ml-4 shrink-0 border-green-300 hover:bg-green-100 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                       >
-                        <RefreshCw className="w-4 h-4 mr-2" />
+                        <RefreshCw className={`w-4 h-4 mr-2 ${isProcessing ? 'animate-spin' : ''}`} />
                         Retry
                       </Button>
                     </AlertDescription>
