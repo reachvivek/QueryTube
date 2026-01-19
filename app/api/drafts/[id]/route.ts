@@ -5,7 +5,7 @@ import { getCurrentUser } from '@/lib/auth';
 // GET /api/drafts/[id] - Get specific draft
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -18,10 +18,11 @@ export async function GET(
     }
 
     const userId = user.id;
+    const { id } = await params;
 
     const draft = await prisma.draft.findFirst({
       where: {
-        id: params.id,
+        id,
         userId, // Ensure user owns this draft
       },
     });
@@ -35,7 +36,7 @@ export async function GET(
 
     // Update lastAccessedAt
     await prisma.draft.update({
-      where: { id: params.id },
+      where: { id },
       data: { lastAccessedAt: new Date() },
     });
 
@@ -55,7 +56,7 @@ export async function GET(
 // PATCH /api/drafts/[id] - Update draft (auto-save)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -68,13 +69,14 @@ export async function PATCH(
     }
 
     const userId = user.id;
+    const { id } = await params;
 
     const body = await request.json();
 
     // Verify ownership
     const existing = await prisma.draft.findFirst({
       where: {
-        id: params.id,
+        id,
         userId,
       },
     });
@@ -87,7 +89,7 @@ export async function PATCH(
     }
 
     const draft = await prisma.draft.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         youtubeUrl: body.youtubeUrl ?? undefined,
         title: body.title ?? undefined,
@@ -123,7 +125,7 @@ export async function PATCH(
 // DELETE /api/drafts/[id] - Delete draft
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -136,11 +138,12 @@ export async function DELETE(
     }
 
     const userId = user.id;
+    const { id } = await params;
 
     // Verify ownership
     const existing = await prisma.draft.findFirst({
       where: {
-        id: params.id,
+        id,
         userId,
       },
     });
@@ -153,7 +156,7 @@ export async function DELETE(
     }
 
     await prisma.draft.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({

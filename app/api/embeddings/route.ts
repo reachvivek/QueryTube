@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { Mistral } from "@mistralai/mistralai";
-import { validateArray, validateProvider } from "@/lib/validation";
+import { validateArray, validateProvider } from "@/utils/validation/validation";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { validateArray } from "@/lib/validation";
+import { validateArray } from "@/utils/validation/validation";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

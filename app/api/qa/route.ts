@@ -4,7 +4,7 @@ import Groq from "groq-sdk";
 import Anthropic from "@anthropic-ai/sdk";
 import { Mistral } from "@mistralai/mistralai";
 import { Pinecone } from "@pinecone-database/pinecone";
-import prisma from "@/lib/db";
+import prisma from "@/utils/db/db";
 import {
   validateString,
   validateArray,
@@ -12,7 +12,7 @@ import {
   validateLanguage,
   validateProvider,
   validateUUID,
-} from "@/lib/validation";
+} from "@/utils/validation/validation";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

@@ -5,7 +5,7 @@
  * Run with: npx tsx scripts/clean-database.ts
  */
 
-import prisma from '../lib/db';
+import prisma from '@/lib/db';
 
 async function cleanDatabase() {
   console.log('🗑️  Starting database cleanup...\n');

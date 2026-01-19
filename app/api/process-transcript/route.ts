@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { YoutubeTranscript } from "youtube-transcript";
-import { downloadYouTubeAudio } from "@/lib/youtube";
-import { transcribeAudio, splitTranscriptIntoChunks, addTimestampsToChunks } from "@/lib/transcribe";
+import { downloadYouTubeAudio } from "@/utils/youtube/youtube";
+import { transcribeAudio, splitTranscriptIntoChunks, addTimestampsToChunks } from "@/utils/ai/transcribe";
 import fs from "fs";
 import path from "path";
 

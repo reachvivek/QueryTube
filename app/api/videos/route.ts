@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
+import prisma from "@/utils/db/db";
 import { getCurrentUser } from "@/lib/auth";
-import { validatePagination, validateString, validateNumber, validateLanguage } from "@/lib/validation";
+import { validatePagination, validateString, validateNumber, validateLanguage } from "@/utils/validation/validation";
 
 export async function GET(request: NextRequest) {
   try {

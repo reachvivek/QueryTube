@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getVideoInfo } from "@/lib/youtube";
+import { getVideoInfo } from "@/utils/youtube/youtube";
 
 /**
  * GET /api/validate-video?url=<youtube_url>

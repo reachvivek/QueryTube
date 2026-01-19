@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { transcribeAudio, splitTranscriptIntoChunks, addTimestampsToChunks } from "@/lib/transcribe";
+import { transcribeAudio, splitTranscriptIntoChunks, addTimestampsToChunks } from "@/utils/ai/transcribe";
 import { existsSync } from "fs";
 
 /**

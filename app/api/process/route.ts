@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { downloadYouTubeAudio } from "@/lib/youtube";
-import { transcribeAudio, splitTranscriptIntoChunks, addTimestampsToChunks } from "@/lib/transcribe";
-import { generateEmbeddings, uploadToPinecone } from "@/lib/embeddings";
+import { downloadYouTubeAudio } from "@/utils/youtube/youtube";
+import { transcribeAudio, splitTranscriptIntoChunks, addTimestampsToChunks } from "@/utils/ai/transcribe";
+import { generateEmbeddings, uploadToPinecone } from "@/utils/ai/embeddings";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 
