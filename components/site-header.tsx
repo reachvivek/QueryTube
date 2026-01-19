@@ -34,7 +34,7 @@ export function SiteHeader() {
           <div className="hidden md:flex items-center gap-6">
             <Link
               href="/"
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors cursor-pointer ${
                 isActive("/") ? "text-black" : "text-gray-700 hover:text-black"
               }`}
             >
@@ -42,7 +42,7 @@ export function SiteHeader() {
             </Link>
             <Link
               href="/about"
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors cursor-pointer ${
                 isActive("/about") ? "text-black" : "text-gray-700 hover:text-black"
               }`}
             >
@@ -50,7 +50,7 @@ export function SiteHeader() {
             </Link>
             <Link
               href="/pricing"
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors cursor-pointer ${
                 isActive("/pricing") ? "text-black" : "text-gray-700 hover:text-black"
               }`}
             >
@@ -58,7 +58,7 @@ export function SiteHeader() {
             </Link>
             <Link
               href="/docs"
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors cursor-pointer ${
                 isActive("/docs") ? "text-black" : "text-gray-700 hover:text-black"
               }`}
             >
@@ -66,19 +66,19 @@ export function SiteHeader() {
             </Link>
             <Link
               href="/faq"
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors cursor-pointer ${
                 isActive("/faq") ? "text-black" : "text-gray-700 hover:text-black"
               }`}
             >
               FAQ
             </Link>
             <Link href="/auth/signin">
-              <Button variant="ghost" className="text-black hover:bg-gray-100">
+              <Button variant="ghost" className="text-black hover:bg-gray-100 cursor-pointer">
                 Sign In
               </Button>
             </Link>
             <Link href="/auth/signin">
-              <Button className="bg-black text-white hover:bg-gray-800">
+              <Button className="bg-black text-white hover:bg-gray-800 cursor-pointer">
                 Get Started
               </Button>
             </Link>
