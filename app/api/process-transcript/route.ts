@@ -79,10 +79,9 @@ export async function POST(request: NextRequest) {
       let currentChunk: any = null;
 
       for (const item of transcript) {
-        // youtube-caption-extractor uses 'start' and 'dur' (in seconds)
-        // Handle both formats for compatibility
-        const startTime = Math.floor(Number(item.start || item.offset / 1000 || 0));
-        const duration = Number(item.dur || item.duration / 1000 || 0);
+        // youtube-caption-extractor uses 'start' and 'dur' (in seconds as strings)
+        const startTime = Math.floor(Number(item.start));
+        const duration = Number(item.dur);
         const endTime = Math.floor(startTime + duration);
 
         if (!currentChunk) {

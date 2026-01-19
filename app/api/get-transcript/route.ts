@@ -72,11 +72,11 @@ export async function POST(request: NextRequest) {
     // Convert transcript to our format
     const fullTranscript = transcript.map((item: any) => item.text).join(" ");
 
-    // Create chunks with timestamps (youtube-caption-extractor uses 'start' and 'dur' in seconds)
+    // Create chunks with timestamps (youtube-caption-extractor uses 'start' and 'dur' in seconds as strings)
     const chunks = transcript.map((item: any, index: number) => ({
       text: item.text,
-      startTime: Math.floor(Number(item.start || 0)),
-      endTime: Math.floor(Number(item.start || 0) + Number(item.dur || 0)),
+      startTime: Math.floor(Number(item.start)),
+      endTime: Math.floor(Number(item.start) + Number(item.dur)),
       chunkIndex: index,
     }));
 
