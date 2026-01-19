@@ -4,7 +4,48 @@ import path from "path";
 import YTDlpWrap from "yt-dlp-wrap";
 
 /**
- * Gets video information without downloading
+ * Extracts video ID from YouTube URL or returns the ID if already an ID
+ */
+function extractVideoId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
+    /youtube\.com\/embed\/([^&\n?#]+)/,
+    /youtube\.com\/v\/([^&\n?#]+)/,
+    /youtube\.com\/shorts\/([^&\n?#]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+
+  // If no pattern matches, assume it's already a video ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(url)) {
+    return url;
+  }
+
+  return null;
+}
+
+/**
+ * Parse ISO 8601 duration to seconds
+ */
+function parseDuration(duration: string): number {
+  const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+  if (!match) return 0;
+
+  const hours = (parseInt(match[1]) || 0);
+  const minutes = (parseInt(match[2]) || 0);
+  const seconds = (parseInt(match[3]) || 0);
+
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
+/**
+ * Gets video information using YouTube Data API v3
+ * Falls back to youtube-sr if API key is not available
  * @param youtubeUrl - The YouTube video URL or ID
  * @returns Video metadata
  */
@@ -12,7 +53,51 @@ export async function getVideoInfo(youtubeUrl: string) {
   try {
     console.log(`[getVideoInfo] Fetching info for: ${youtubeUrl}`);
 
-    // youtube-sr can accept URL or video ID
+    const videoId = extractVideoId(youtubeUrl);
+    if (!videoId) {
+      throw new Error("Invalid YouTube URL or video ID");
+    }
+
+    // Try YouTube Data API v3 first (more reliable in serverless)
+    const apiKey = process.env.YOUTUBE_API_KEY;
+
+    if (apiKey) {
+      console.log(`[getVideoInfo] Using YouTube Data API v3`);
+
+      const apiUrl = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet,contentDetails&key=${apiKey}`;
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      if (data.error) {
+        console.error(`[getVideoInfo] API Error:`, data.error);
+        throw new Error(data.error.message || "YouTube API error");
+      }
+
+      if (!data.items || data.items.length === 0) {
+        throw new Error("Video not found or unavailable");
+      }
+
+      const video = data.items[0];
+      const snippet = video.snippet;
+      const contentDetails = video.contentDetails;
+
+      const durationInSeconds = parseDuration(contentDetails.duration);
+
+      console.log(`[getVideoInfo] Successfully fetched: ${snippet.title}`);
+
+      return {
+        title: snippet.title || "Untitled Video",
+        duration: durationInSeconds,
+        description: snippet.description || "",
+        thumbnail: snippet.thumbnails?.maxres?.url ||
+                   snippet.thumbnails?.high?.url ||
+                   snippet.thumbnails?.medium?.url || "",
+        uploader: snippet.channelTitle || "Unknown",
+      };
+    }
+
+    // Fallback to youtube-sr (web scraping - may fail in production)
+    console.log(`[getVideoInfo] Falling back to youtube-sr (scraping)`);
     const video = await YouTube.getVideo(youtubeUrl);
 
     if (!video) {
@@ -21,12 +106,11 @@ export async function getVideoInfo(youtubeUrl: string) {
 
     console.log(`[getVideoInfo] Successfully fetched: ${video.title}`);
 
-    // youtube-sr returns duration in milliseconds, convert to seconds
     const durationInSeconds = Math.floor((video.duration || 0) / 1000);
 
     return {
       title: video.title || "Untitled Video",
-      duration: durationInSeconds, // Duration in seconds
+      duration: durationInSeconds,
       description: video.description || "",
       thumbnail: video.thumbnail?.url || "",
       uploader: video.channel?.name || "Unknown",
@@ -34,7 +118,6 @@ export async function getVideoInfo(youtubeUrl: string) {
   } catch (error: any) {
     console.error("[getVideoInfo] Error:", error);
 
-    // Provide user-friendly error messages
     let errorMessage = error.message || "Unknown error occurred";
 
     if (errorMessage.includes("unavailable")) {
@@ -130,27 +213,3 @@ export async function downloadYouTubeAudio(
   }
 }
 
-/**
- * Extracts video ID from YouTube URL
- */
-function extractVideoId(url: string): string | null {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-    /youtube\.com\/embed\/([^&\n?#]+)/,
-    /youtube\.com\/v\/([^&\n?#]+)/,
-  ];
-
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match && match[1]) {
-      return match[1];
-    }
-  }
-
-  // If no pattern matches, assume it's already a video ID
-  if (/^[a-zA-Z0-9_-]{11}$/.test(url)) {
-    return url;
-  }
-
-  return null;
-}
