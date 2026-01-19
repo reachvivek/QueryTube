@@ -487,7 +487,8 @@ function NewVideoContent() {
         clearTimeout(draftSaveTimeoutRef.current);
       }
     };
-  }, [currentStep, videoInfo, processingStatus, transcriptData, vectorsUploaded, videoId]);
+    // Only track step changes and major milestones, not every status change
+  }, [currentStep, videoInfo?.id, transcriptSource, vectorsUploaded]);
 
   const steps: { id: Step; label: string; number: number }[] = [
     { id: "upload", label: t.steps[0], number: 1 },
@@ -1117,10 +1118,12 @@ function NewVideoContent() {
 
   // Start processing when entering Step 2
   useEffect(() => {
-    if (currentStep === "process" && videoInfo && !transcriptData && processingStatus === "idle" && !isProcessingRef.current) {
+    // Only auto-start processing once when entering Step 2 with video info
+    // Don't re-process if we already have transcript data or if we're already processing
+    if (currentStep === "process" && videoInfo && !transcriptData && !isProcessingRef.current) {
       processVideo();
     }
-  }, [currentStep, videoInfo, transcriptData, processingStatus]);
+  }, [currentStep, videoInfo?.id]); // Only depend on step and video ID, not status or transcriptData
 
   // Generate summary in Step 4 if missing
   useEffect(() => {
@@ -1568,10 +1571,13 @@ function NewVideoContent() {
                         size="sm"
                         onClick={() => {
                           forceReprocessRef.current = true;
+                          isProcessingRef.current = false;
                           setProcessingStatus("idle");
                           setTranscriptData(null);
                           setTranscriptSource(null);
                           setProcessingError(null);
+                          // Directly trigger reprocessing
+                          processVideo();
                         }}
                         disabled={isProcessing}
                         className="ml-4 shrink-0 border-green-300 hover:bg-green-100"
