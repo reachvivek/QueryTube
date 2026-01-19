@@ -54,8 +54,8 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "uuid": "^13.0.0",
+    "youtube-caption-extractor": "^1.9.1",
     "youtube-sr": "^4.3.12",
-    "youtube-transcript": "^1.2.1",
     "youtubei.js": "^16.0.1",
     "yt-dlp-wrap": "^2.3.12"
   },
