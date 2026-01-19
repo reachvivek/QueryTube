@@ -395,9 +395,9 @@ export default function LandingPage() {
             Free to try • No credit card required
           </p>
           <Link href="/auth/signin">
-            <Button size="lg" className="bg-black text-white hover:bg-gray-800 text-base sm:text-lg px-8 sm:px-12 py-5 sm:py-6 h-12 sm:h-auto">
+            <Button className="bg-black text-white hover:bg-gray-800 text-sm sm:text-base px-6 sm:px-8 py-2.5 sm:py-3">
               Get Started Free
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>
