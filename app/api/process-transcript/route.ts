@@ -29,20 +29,34 @@ export async function POST(request: NextRequest) {
   try {
     // ============= STEP 1: Try YouTube Captions (Fast Method) =============
 
+    console.log(`[ProcessTranscript] Step 1: Trying YouTube captions for video ${videoId}`);
+
     let transcript;
-    try {
-      // Try requested language first with youtube-transcript (more reliable)
-      transcript = await YoutubeTranscript.fetchTranscript(videoId, {
-        lang: requestedLang,
-      });
-      detectedLanguage = requestedLang;
-    } catch (error) {
-      // Fallback: try without language constraint (auto-detect)
+    const languagesToTry = [requestedLang, "en", "hi", "es", "fr", "de", "pt", "ar", "ja", "ko"];
+
+    // Try multiple languages in order
+    for (const lang of languagesToTry) {
       try {
+        console.log(`[ProcessTranscript] Attempting captions in language: ${lang}`);
+        transcript = await YoutubeTranscript.fetchTranscript(videoId, { lang });
+        detectedLanguage = lang;
+        console.log(`[ProcessTranscript] ✅ Successfully fetched ${lang} captions (${transcript.length} segments)`);
+        break;
+      } catch (error: any) {
+        console.log(`[ProcessTranscript] ❌ ${lang} captions not available: ${error.message}`);
+      }
+    }
+
+    // If all languages fail, try auto-detect (no language specified)
+    if (!transcript) {
+      try {
+        console.log(`[ProcessTranscript] Attempting auto-detect captions (no language specified)`);
         transcript = await YoutubeTranscript.fetchTranscript(videoId);
         detectedLanguage = "auto";
-      } catch (fallbackError) {
-        // YouTube captions not available, will try Whisper next
+        console.log(`[ProcessTranscript] ✅ Successfully fetched auto-detect captions (${transcript.length} segments)`);
+      } catch (fallbackError: any) {
+        console.log(`[ProcessTranscript] ❌ Auto-detect captions failed: ${fallbackError.message}`);
+        console.log(`[ProcessTranscript] No captions available, will try Whisper next`);
         transcript = null;
       }
     }
@@ -114,22 +128,32 @@ export async function POST(request: NextRequest) {
 
     // ============= STEP 2: Fallback to Audio Download + Whisper =============
 
+    console.log(`[ProcessTranscript] Step 2: YouTube captions failed, trying Whisper transcription`);
+
     let audioPath: string | null = null;
 
     try {
       // Download audio
+      console.log(`[ProcessTranscript] Downloading audio from YouTube...`);
       const downloadResult = await downloadYouTubeAudio(youtubeUrl, "./downloads");
       audioPath = downloadResult.filePath;
 
-      // Check file size (Groq Whisper limit is 25MB)
-      if (downloadResult.fileSize > 25 * 1024 * 1024) {
-        throw new Error(
-          `Audio file too large (${(downloadResult.fileSize / 1024 / 1024).toFixed(2)}MB). Groq Whisper supports up to 25MB.`
-        );
+      const fileSizeMB = downloadResult.fileSize / 1024 / 1024;
+      console.log(`[ProcessTranscript] Audio downloaded: ${fileSizeMB.toFixed(2)}MB`);
+
+      // Check file size and choose appropriate Whisper provider
+      const GROQ_LIMIT_MB = 25;
+      const useOpenAI = fileSizeMB > GROQ_LIMIT_MB;
+
+      if (useOpenAI) {
+        console.log(`[ProcessTranscript] File size ${fileSizeMB.toFixed(2)}MB exceeds Groq limit (${GROQ_LIMIT_MB}MB)`);
+        console.log(`[ProcessTranscript] Using OpenAI Whisper for transcription...`);
+      } else {
+        console.log(`[ProcessTranscript] Using Groq Whisper for transcription...`);
       }
 
-      // Transcribe with Groq Whisper (let it auto-detect language)
-      const transcription = await transcribeAudio(audioPath, requestedLang);
+      // Transcribe with appropriate provider
+      const transcription = await transcribeAudio(audioPath, requestedLang, useOpenAI ? "openai" : "groq");
 
       // Split into chunks
       const chunks = splitTranscriptIntoChunks(transcription.text, 90, 10);
@@ -139,6 +163,8 @@ export async function POST(request: NextRequest) {
       if (fs.existsSync(audioPath)) {
         fs.unlinkSync(audioPath);
       }
+
+      console.log(`[ProcessTranscript] ✅ Whisper transcription successful`);
 
       return NextResponse.json({
         success: true,
@@ -161,13 +187,25 @@ export async function POST(request: NextRequest) {
         fs.unlinkSync(audioPath);
       }
 
-      console.error("[ProcessTranscript] Whisper failed:", whisperError);
+      console.error("[ProcessTranscript] Whisper transcription failed:", whisperError);
+
+      // Provide helpful error messages
+      let userMessage = whisperError.message;
+
+      if (whisperError.message.includes("API key not configured")) {
+        userMessage = "Transcription service not configured. Please contact support.";
+      } else if (whisperError.message.includes("File too large")) {
+        userMessage = "Video too long for automatic transcription. Try a shorter video or upload a transcript manually.";
+      } else if (whisperError.message.includes("ENOENT")) {
+        userMessage = "Transcription tool not found. Please contact support.";
+      }
 
       return NextResponse.json(
         {
           success: false,
-          error: `Failed to transcribe: ${whisperError.message}`,
+          error: `Failed to transcribe: ${userMessage}`,
           method: "whisper-transcription",
+          details: whisperError.message, // Keep original error for debugging
         },
         { status: 200 }
       );

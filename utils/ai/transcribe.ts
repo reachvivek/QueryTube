@@ -1,19 +1,26 @@
 import Groq from "groq-sdk";
+import OpenAI from "openai";
 import fs from "fs";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 /**
- * Transcribes an audio file using Groq's Whisper implementation
+ * Transcribes an audio file using Whisper (Groq or OpenAI)
  * @param audioFilePath - Path to the audio file
  * @param language - Language code (optional, auto-detects if not provided)
+ * @param provider - "groq" (faster, 25MB limit) or "openai" (slower, 25MB limit but more reliable for large files)
  * @returns Transcription text and detected language
  */
 export async function transcribeAudio(
   audioFilePath: string,
-  language?: string
+  language?: string,
+  provider: "groq" | "openai" = "groq"
 ): Promise<{ text: string; language: string; duration: number }> {
   try {
     // Check if file exists
@@ -21,30 +28,53 @@ export async function transcribeAudio(
       throw new Error(`Audio file not found: ${audioFilePath}`);
     }
 
-    // Get file size (Groq Whisper has 25MB limit)
+    // Get file size
     const stats = fs.statSync(audioFilePath);
     const fileSizeMB = stats.size / (1024 * 1024);
 
-    if (fileSizeMB > 25) {
-      throw new Error(
-        `File too large (${fileSizeMB.toFixed(2)}MB). Groq Whisper supports files up to 25MB.`
-      );
-    }
+    console.log(`[Transcribe] Using ${provider.toUpperCase()} Whisper for ${fileSizeMB.toFixed(2)}MB file`);
 
     const startTime = Date.now();
+    let transcription: any;
 
-    // Create transcription using Groq's Whisper
-    const transcription = await groq.audio.transcriptions.create({
-      file: fs.createReadStream(audioFilePath),
-      model: "whisper-large-v3-turbo", // Groq's fastest Whisper model
-      language: language, // Optional: 'fr' for French, 'en' for English, auto-detects if not provided
-      response_format: "verbose_json", // Get detailed response with language detection
-    }) as any; // Groq SDK types don't include language field yet
+    if (provider === "openai") {
+      // OpenAI Whisper (more reliable for large files)
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error("OpenAI API key not configured. Please add OPENAI_API_KEY to .env");
+      }
+
+      transcription = await openai.audio.transcriptions.create({
+        file: fs.createReadStream(audioFilePath),
+        model: "whisper-1",
+        language: language,
+        response_format: "verbose_json",
+      });
+    } else {
+      // Groq Whisper (faster, free tier)
+      if (!process.env.GROQ_API_KEY) {
+        throw new Error("Groq API key not configured. Please add GROQ_API_KEY to .env");
+      }
+
+      if (fileSizeMB > 25) {
+        throw new Error(
+          `File too large (${fileSizeMB.toFixed(2)}MB). Groq Whisper supports files up to 25MB. Use OpenAI provider instead.`
+        );
+      }
+
+      transcription = await groq.audio.transcriptions.create({
+        file: fs.createReadStream(audioFilePath),
+        model: "whisper-large-v3-turbo",
+        language: language,
+        response_format: "verbose_json",
+      }) as any;
+    }
 
     const duration = (Date.now() - startTime) / 1000;
 
     // Extract detected language from response
     const detectedLanguage = transcription.language || language || "unknown";
+
+    console.log(`[Transcribe] ✅ Transcription completed in ${duration.toFixed(2)}s (language: ${detectedLanguage})`);
 
     return {
       text: transcription.text,
@@ -52,7 +82,7 @@ export async function transcribeAudio(
       duration,
     };
   } catch (error: any) {
-    console.error("[Groq Whisper] Transcription error:", error);
+    console.error(`[${provider.toUpperCase()} Whisper] Transcription error:`, error);
     throw new Error(`Failed to transcribe audio: ${error.message}`);
   }
 }
