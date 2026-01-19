@@ -50,3 +50,6 @@ prisma/migrations/
 # test files
 test-*.js
 nul
+
+# yt-dlp binaries
+/bin/

@@ -158,8 +158,10 @@ export async function downloadYouTubeAudio(
       throw new Error("Invalid YouTube URL");
     }
 
-    // Initialize yt-dlp wrapper
-    const ytDlpWrap = new YTDlpWrap();
+    // Initialize yt-dlp wrapper with platform-specific binary
+    const ytDlpBinary = process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp';
+    const ytDlpPath = path.join(process.cwd(), 'bin', ytDlpBinary);
+    const ytDlpWrap = new YTDlpWrap(fs.existsSync(ytDlpPath) ? ytDlpPath : undefined);
 
     // Get video info first
     const videoInfo = await getVideoInfo(youtubeUrl);
