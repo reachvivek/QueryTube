@@ -116,8 +116,6 @@ function NewVideoContent() {
   const [transcriptSource, setTranscriptSource] = useState<string | null>(null);
   const [processingError, setProcessingError] = useState<string | null>(null);
   const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
-  const [sessionRestored, setSessionRestored] = useState(false);
-  const [showSessionBanner, setShowSessionBanner] = useState(false);
 
   // Ref to prevent duplicate processing
   const isProcessingRef = useRef(false);
@@ -144,6 +142,11 @@ function NewVideoContent() {
   // Chat ref for auto-scroll
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const questionInputRef = useRef<HTMLInputElement>(null);
+
+  // Draft state for auto-save
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const draftSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Modal state
   const [modalState, setModalState] = useState<{
@@ -182,6 +185,81 @@ function NewVideoContent() {
 
   const hideLoading = () => {
     setGlobalLoading({ isLoading: false, message: "" });
+  };
+
+  // Draft auto-save function
+  const saveDraft = async () => {
+    // Don't save if we don't have basic info yet
+    if (!videoInfo) return;
+
+    try {
+      setIsSavingDraft(true);
+
+      // Calculate completion percentage based on current step
+      const stepCompletionMap: Record<Step, number> = {
+        upload: 20,
+        process: 40,
+        knowledge: 60,
+        configure: 80,
+        deploy: 100,
+      };
+      const completionPercentage = stepCompletionMap[currentStep] || 0;
+
+      // Prepare draft data
+      const draftData = {
+        title: videoInfo.title,
+        youtubeUrl: youtubeUrl,
+        youtubeId: videoInfo.id,
+        thumbnail: videoInfo.thumbnail,
+        duration: videoInfo.duration,
+        durationFormatted: videoInfo.durationFormatted,
+        uploader: videoInfo.uploader,
+        description: videoInfo.description,
+        currentStep: currentStep,
+        completionPercentage: completionPercentage,
+        processingStatus: processingStatus,
+        transcriptData: transcriptData,
+        transcriptSource: transcriptSource,
+        data: {
+          videoInfo: videoInfo,
+          processingStatus: processingStatus,
+          transcriptData: transcriptData,
+          transcriptSource: transcriptSource,
+          vectorsUploaded: vectorsUploaded,
+          videoId: videoId,
+        },
+      };
+
+      const response = await fetch("/api/drafts", {
+        method: draftId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draftId ? { id: draftId, ...draftData } : draftData),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.draft) {
+        // Set draft ID if this is a new draft
+        if (!draftId) {
+          setDraftId(result.draft.id);
+        }
+      }
+    } catch (error) {
+      console.error("[Draft] Failed to save draft:", error);
+    } finally {
+      setIsSavingDraft(false);
+    }
+  };
+
+  // Debounced draft save - saves 2 seconds after last change
+  const debouncedSaveDraft = () => {
+    if (draftSaveTimeoutRef.current) {
+      clearTimeout(draftSaveTimeoutRef.current);
+    }
+
+    draftSaveTimeoutRef.current = setTimeout(() => {
+      saveDraft();
+    }, 2000); // Save 2 seconds after last change
   };
 
   // Helper function to render message content with clickable timestamps
@@ -284,9 +362,6 @@ function NewVideoContent() {
             // No transcript - start from process step
             setCurrentStep("process");
           }
-
-          // Mark this video as the last active video
-          localStorage.setItem("youtube-qa-last-video", video.id);
         }
       } catch (error) {
         console.error("[Edit Mode] Failed to load video:", error);
@@ -295,8 +370,6 @@ function NewVideoContent() {
           title: "Unable to Load Video",
           description: "Failed to load video data. Please try again from the dashboard.",
         });
-      } finally {
-        setSessionRestored(true);
       }
     }
 
@@ -304,110 +377,6 @@ function NewVideoContent() {
       loadExistingVideo();
     }
   }, [editVideoId]);
-
-  // Restore session from localStorage on mount (per-video sessions)
-  useEffect(() => {
-    if (editVideoId) return; // Don't restore from localStorage in edit mode
-
-    try {
-      // Get the last active video ID
-      const lastVideoId = localStorage.getItem("youtube-qa-last-video");
-
-      if (lastVideoId) {
-        // Load that video's session
-        const sessionKey = `youtube-qa-session-${lastVideoId}`;
-        const savedSession = localStorage.getItem(sessionKey);
-
-        if (savedSession) {
-          const session = JSON.parse(savedSession);
-
-          // Ask user if they want to continue or start fresh
-          showModal({
-            type: "info",
-            title: "Resume Your Work?",
-            description: `You have an incomplete knowledge base for "${session.videoInfo?.title || 'your video'}".`,
-            content: (
-              <div className="text-sm space-y-2">
-                <p>Would you like to continue where you left off, or start a new one?</p>
-              </div>
-            ),
-            actionLabel: "Continue",
-            onAction: () => {
-              closeModal();
-              showLoading("Restoring your session...");
-
-              setTimeout(() => {
-                // Restore state
-                if (session.currentStep) setCurrentStep(session.currentStep);
-                if (session.youtubeUrl) setYoutubeUrl(session.youtubeUrl);
-                if (session.videoInfo) setVideoInfo(session.videoInfo);
-                if (session.videoId) setVideoId(session.videoId);
-                if (session.processingStatus) setProcessingStatus(session.processingStatus);
-                if (session.transcriptData) setTranscriptData(session.transcriptData);
-                if (session.transcriptSource) setTranscriptSource(session.transcriptSource);
-
-                setShowSessionBanner(true);
-                setSessionRestored(true);
-                hideLoading();
-
-                // Auto-hide banner after 8 seconds
-                setTimeout(() => {
-                  setShowSessionBanner(false);
-                }, 8000);
-              }, 500);
-            },
-            onCancel: () => {
-              closeModal();
-              showLoading("Starting fresh...");
-
-              setTimeout(() => {
-                localStorage.removeItem("youtube-qa-last-video");
-                localStorage.removeItem(sessionKey);
-                setSessionRestored(true);
-                hideLoading();
-              }, 300);
-            },
-            showCancel: true,
-          });
-
-          // Don't set sessionRestored yet - wait for user choice
-          return;
-        }
-      }
-    } catch (error) {
-      console.error("[Session] Failed to restore session:", error);
-    } finally {
-      setSessionRestored(true);
-    }
-  }, [editVideoId]);
-
-  // Save session to localStorage whenever key state changes (per-video)
-  useEffect(() => {
-    if (!sessionRestored) return; // Don't save until we've restored first
-    if (!videoId) return; // Need videoId to save session
-
-    const session = {
-      currentStep,
-      youtubeUrl,
-      videoInfo,
-      videoId,
-      processingStatus,
-      transcriptData,
-      transcriptSource,
-      timestamp: new Date().toISOString(),
-    };
-
-    try {
-      // Save this video's session
-      const sessionKey = `youtube-qa-session-${videoId}`;
-      localStorage.setItem(sessionKey, JSON.stringify(session));
-
-      // Mark this as the last active video
-      localStorage.setItem("youtube-qa-last-video", videoId);
-    } catch (error) {
-      console.error("[Session] Failed to save session:", error);
-    }
-  }, [currentStep, videoInfo, videoId, processingStatus, transcriptData, transcriptSource, sessionRestored]);
 
   // Check if transcript already processed when navigating to knowledge step
   useEffect(() => {
@@ -442,18 +411,83 @@ function NewVideoContent() {
     checkTranscriptStatus();
   }, [currentStep, videoId]);
 
-  // Function to clear session for current video
-  const clearSession = () => {
-    try {
-      if (videoId) {
-        const sessionKey = `youtube-qa-session-${videoId}`;
-        localStorage.removeItem(sessionKey);
+  // Load draft on mount (only if not in edit mode)
+  useEffect(() => {
+    if (editVideoId) return; // Don't load draft in edit mode
+
+    const loadDraft = async () => {
+      try {
+        const response = await fetch("/api/drafts");
+        const data = await response.json();
+
+        if (data.success && data.drafts && data.drafts.length > 0) {
+          // Get the most recent draft
+          const latestDraft = data.drafts[0];
+
+          // Restore state from draft
+          setDraftId(latestDraft.id);
+          setYoutubeUrl(latestDraft.youtubeUrl || "");
+          setCurrentStep(latestDraft.currentStep as Step);
+
+          // Restore videoInfo from draft fields
+          if (latestDraft.youtubeId && latestDraft.title) {
+            setVideoInfo({
+              id: latestDraft.youtubeId,
+              videoId: latestDraft.youtubeId,
+              title: latestDraft.title,
+              duration: latestDraft.duration || 0,
+              durationFormatted: latestDraft.durationFormatted || "0:00",
+              thumbnail: latestDraft.thumbnail || "",
+              uploader: latestDraft.uploader || "",
+              description: latestDraft.description || "",
+              estimatedSizeMB: 0,
+              url: latestDraft.youtubeUrl || "",
+            });
+          }
+
+          // Restore processing state
+          if (latestDraft.processingStatus) {
+            setProcessingStatus(latestDraft.processingStatus);
+          }
+
+          if (latestDraft.transcriptData) {
+            setTranscriptData(latestDraft.transcriptData);
+          }
+
+          if (latestDraft.transcriptSource) {
+            setTranscriptSource(latestDraft.transcriptSource);
+          }
+
+          // Restore additional state from data object if available
+          if (latestDraft.data) {
+            if (latestDraft.data.vectorsUploaded) setVectorsUploaded(latestDraft.data.vectorsUploaded);
+            if (latestDraft.data.videoId) setVideoId(latestDraft.data.videoId);
+          }
+
+          console.log("[Draft] Loaded draft:", latestDraft.title);
+        }
+      } catch (error) {
+        console.error("[Draft] Failed to load draft:", error);
       }
-      localStorage.removeItem("youtube-qa-last-video");
-    } catch (error) {
-      console.error("[Session] Failed to clear session:", error);
-    }
-  };
+    };
+
+    loadDraft();
+  }, [editVideoId]);
+
+  // Auto-save draft when key state changes (debounced)
+  useEffect(() => {
+    // Don't auto-save in edit mode or if we don't have basic info
+    if (editVideoId || !videoInfo) return;
+
+    debouncedSaveDraft();
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (draftSaveTimeoutRef.current) {
+        clearTimeout(draftSaveTimeoutRef.current);
+      }
+    };
+  }, [currentStep, videoInfo, processingStatus, transcriptData, vectorsUploaded, videoId]);
 
   const steps: { id: Step; label: string; number: number }[] = [
     { id: "upload", label: t.steps[0], number: 1 },
@@ -1191,26 +1225,23 @@ function NewVideoContent() {
       />
 
       <div className="p-4 sm:p-6 lg:p-8">
-        {/* Session Info & Reset */}
-        {showSessionBanner && currentStep !== "upload" && videoInfo && (
-          <Alert className="mb-6 bg-blue-50 border-blue-200 relative">
-            <AlertCircle className="w-4 h-4 text-blue-600" />
-            <AlertDescription className="pr-8">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-blue-900">
-                  Continuing: <strong>{videoInfo.title}</strong>
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowSessionBanner(false)}
-                  className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-blue-100"
-                >
-                  <X className="h-4 w-4 text-blue-600" />
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
+        {/* Auto-save Indicator */}
+        {!isEditMode && videoInfo && (
+          <div className="mb-4 flex justify-end">
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              {isSavingDraft ? (
+                <>
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <span>Saving draft...</span>
+                </>
+              ) : draftId ? (
+                <>
+                  <CheckCircle2 className="w-3 h-3 text-green-600" />
+                  <span className="text-green-600">Draft saved</span>
+                </>
+              ) : null}
+            </div>
+          </div>
         )}
 
         {/* Step Progress Indicator */}
@@ -1258,13 +1289,9 @@ function NewVideoContent() {
           {currentStep === "upload" && (
             <Card className="border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-black flex items-center gap-2">
-                  <Video className="w-5 h-5" />
-                  Video Source
+                <CardTitle className="text-black text-xl">
+                  Turn any video into a searchable knowledge base
                 </CardTitle>
-                <CardDescription>
-                  Enter a YouTube URL to validate and preview the video
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* YouTube URL Input */}
@@ -1318,19 +1345,24 @@ function NewVideoContent() {
 
                   {/* Validating State */}
                   {isValidating && (
-                    <p className="text-sm text-blue-600 flex items-center gap-2">
+                    <p className="text-sm text-gray-500 flex items-center gap-2">
                       <Loader2 className="w-3 h-3 animate-spin" />
-                      Validating video...
+                      Checking video...
+                    </p>
+                  )}
+
+                  {/* Success State Message */}
+                  {videoInfo && !isValidating && (
+                    <p className="text-sm text-gray-500">
+                      Video ready.
                     </p>
                   )}
                 </div>
 
                 {/* Video Preview Card */}
                 {videoInfo && (
-                  <Alert className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    <AlertDescription>
-                      <div className="flex gap-4 mt-2">
+                  <div className="border border-gray-200 rounded-lg p-4 bg-white">
+                      <div className="flex gap-4">
                         {/* Thumbnail */}
                         <div className="relative flex-shrink-0">
                           <img
@@ -1368,57 +1400,58 @@ function NewVideoContent() {
                             </div>
                           </div>
 
-                          <Badge className="bg-green-600 text-white hover:bg-green-700">
-                            ✓ Valid & Ready to Process
+                          <Badge variant="outline" className="border-green-600 text-green-700">
+                            Ready
                           </Badge>
                         </div>
                       </div>
-                    </AlertDescription>
-                  </Alert>
+                  </div>
                 )}
 
-                <Separator />
-
                 {/* File Upload Alternative */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-black">
-                    Or Upload Audio/Video File
-                  </label>
-                  <Input
-                    type="file"
-                    accept="audio/*,video/*"
-                    className="border-gray-300 cursor-pointer"
-                  />
-                  <p className="text-xs text-gray-500">
-                    Supports: MP3, MP4, WAV, M4A, WebM (Max 25MB)
-                  </p>
-                </div>
+                <details className="group">
+                  <summary className="text-sm text-gray-600 cursor-pointer hover:text-gray-900 list-none">
+                    <span className="inline-flex items-center gap-1">
+                      Or upload a file
+                      <ChevronDown className="w-3 h-3 transition-transform group-open:rotate-180" />
+                    </span>
+                  </summary>
+                  <div className="mt-3 space-y-2">
+                    <Input
+                      type="file"
+                      accept="audio/*,video/*"
+                      className="text-sm"
+                    />
+                    <p className="text-xs text-gray-500">
+                      MP3, MP4, WAV, M4A, WebM · Max 25MB
+                    </p>
+                  </div>
+                </details>
 
                 {/* Action Button */}
                 <div className="pt-4">
                   <Button
                     className="w-full bg-black text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!canProceed}
-                    onClick={() => {
+                    onClick={async () => {
                       setIsProcessing(true);
+                      // Save draft immediately before proceeding
+                      await saveDraft();
                       setCurrentStep("process");
                     }}
                   >
                     {isValidating ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Validating...
+                        Checking...
                       </>
                     ) : (
-                      <>
-                        Make Video Searchable
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </>
+                      "Continue"
                     )}
                   </Button>
-                  {!canProceed && youtubeUrl && !isValidating && (
-                    <p className="text-xs text-gray-500 text-center mt-2">
-                      Please enter a valid YouTube URL to continue
+                  {canProceed && videoInfo && (
+                    <p className="text-xs text-gray-500 text-center mt-3">
+                      Takes a few minutes. Private until you share.
                     </p>
                   )}
                 </div>
@@ -2062,7 +2095,19 @@ function NewVideoContent() {
                   </Button>
                   <Button
                     className="flex-1 bg-black text-white hover:bg-gray-800"
-                    onClick={() => (window.location.href = "/")}
+                    onClick={async () => {
+                      // Delete draft when user completes the flow
+                      if (draftId) {
+                        try {
+                          await fetch(`/api/drafts/${draftId}`, {
+                            method: "DELETE",
+                          });
+                        } catch (error) {
+                          console.error("[Draft] Failed to delete draft:", error);
+                        }
+                      }
+                      window.location.href = "/";
+                    }}
                   >
                     Go to Dashboard
                   </Button>

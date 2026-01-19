@@ -205,22 +205,27 @@ model Draft {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Video information
-  youtubeUrl  String?
-  title       String?
-  thumbnail   String?
-  duration    Int? // in seconds
-  youtubeId   String?
-  uploader    String?
-  description String?
+  youtubeUrl        String?
+  title             String?
+  thumbnail         String?
+  duration          Int? // in seconds
+  durationFormatted String?
+  youtubeId         String?
+  uploader          String?
+  description       String?
 
   // Processing state
-  currentStep      String  @default("upload") // upload, process, knowledge, configure, deploy
-  status           String  @default("draft") // draft, completed, abandoned
-  processingStatus String? // idle, processing, processed, error
+  currentStep          String  @default("upload") // upload, process, knowledge, configure, deploy
+  completionPercentage Int     @default(0) // 0-100
+  status               String  @default("draft") // draft, completed, abandoned
+  processingStatus     String? // idle, processing, processed, error
 
   // Transcript data (JSON)
   transcriptData   Json? // Stores transcript chunks
   transcriptSource String? // youtube-captions, whisper-api
+
+  // Additional state data (JSON)
+  data Json? // Stores additional state like videoInfo, vectorsUploaded, etc.
 
   // Linked video (when completed)
   videoId String? @unique

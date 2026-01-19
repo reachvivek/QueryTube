@@ -66,14 +66,17 @@ export async function POST(request: NextRequest) {
         title: body.title || 'Untitled Draft',
         thumbnail: body.thumbnail,
         duration: body.duration,
+        durationFormatted: body.durationFormatted,
         youtubeId: body.youtubeId,
         uploader: body.uploader,
         description: body.description,
         currentStep: body.currentStep || 'upload',
+        completionPercentage: body.completionPercentage || 0,
         status: 'draft',
         processingStatus: body.processingStatus || 'idle',
         transcriptData: body.transcriptData || undefined,
         transcriptSource: body.transcriptSource,
+        data: body.data,
       },
     });
 
@@ -86,6 +89,79 @@ export async function POST(request: NextRequest) {
     console.error('[Drafts] POST error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to create draft' },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/drafts - Update existing draft
+export async function PUT(request: NextRequest) {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const userId = user.id;
+    const body = await request.json();
+
+    if (!body.id) {
+      return NextResponse.json(
+        { error: 'Draft ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Verify ownership
+    const existingDraft = await prisma.draft.findFirst({
+      where: {
+        id: body.id,
+        userId,
+      },
+    });
+
+    if (!existingDraft) {
+      return NextResponse.json(
+        { error: 'Draft not found or unauthorized' },
+        { status: 404 }
+      );
+    }
+
+    const draft = await prisma.draft.update({
+      where: {
+        id: body.id,
+      },
+      data: {
+        youtubeUrl: body.youtubeUrl || existingDraft.youtubeUrl,
+        title: body.title || existingDraft.title,
+        thumbnail: body.thumbnail || existingDraft.thumbnail,
+        duration: body.duration !== undefined ? body.duration : existingDraft.duration,
+        durationFormatted: body.durationFormatted || existingDraft.durationFormatted,
+        youtubeId: body.youtubeId || existingDraft.youtubeId,
+        uploader: body.uploader || existingDraft.uploader,
+        description: body.description || existingDraft.description,
+        currentStep: body.currentStep || existingDraft.currentStep,
+        completionPercentage: body.completionPercentage !== undefined ? body.completionPercentage : existingDraft.completionPercentage,
+        processingStatus: body.processingStatus || existingDraft.processingStatus,
+        transcriptData: body.transcriptData !== undefined ? body.transcriptData : existingDraft.transcriptData,
+        transcriptSource: body.transcriptSource !== undefined ? body.transcriptSource : existingDraft.transcriptSource,
+        data: body.data !== undefined ? body.data : existingDraft.data,
+        lastAccessedAt: new Date(),
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      draft,
+    });
+  } catch (error: any) {
+    console.error('[Drafts] PUT error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to update draft' },
       { status: 500 }
     );
   }
