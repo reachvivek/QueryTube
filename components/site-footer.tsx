@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Github, Linkedin, Twitter } from "lucide-react";
+import { ArrowRight, Github, Instagram, Linkedin } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -100,7 +100,16 @@ export function SiteFooter() {
           {/* Bottom Bar - Mobile */}
           <div className="pt-6 border-t border-gray-200">
             <div className="text-center text-sm text-gray-500">
-              <p>© 2026 QueryTube · Built by Vivek Kumar Singh</p>
+              <p>© 2026 QueryTube · Built by{" "}
+                <Link
+                  href="https://linkedin.com/in/reachvivek"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-black transition-colors"
+                >
+                  Vivek Kumar Singh
+                </Link>
+              </p>
             </div>
           </div>
         </div>
@@ -199,7 +208,15 @@ export function SiteFooter() {
           {/* Bottom Bar - Desktop */}
           <div className="pt-8 border-t border-gray-200 flex items-center justify-between">
             <p className="text-sm text-gray-500">
-              © 2026 QueryTube · Built by Vivek Kumar Singh
+              © 2026 QueryTube · Built by{" "}
+              <Link
+                href="https://linkedin.com/in/reachvivek"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-black transition-colors"
+              >
+                Vivek Kumar Singh
+              </Link>
             </p>
 
             {/* Social Links */}
@@ -221,12 +238,12 @@ export function SiteFooter() {
                 <Linkedin className="w-5 h-5" />
               </Link>
               <Link
-                href="https://twitter.com/reachvivek"
+                href="https://instagram.com/rogerthatvivek"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-black transition-colors"
               >
-                <Twitter className="w-5 h-5" />
+                <Instagram className="w-5 h-5" />
               </Link>
             </div>
           </div>
