@@ -311,208 +311,265 @@ export default function Dashboard() {
         icon={LayoutDashboard}
       />
 
-      <div className="p-4 sm:p-6 lg:p-8 pb-20 sm:pb-8">
-        {/* Quick Stats - Mobile Optimized */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-          <Card className="border-gray-200 hover:border-gray-300 transition-colors">
-            <CardContent className="p-4 sm:pt-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div className="mb-2 sm:mb-0">
-                  <p className="text-xs sm:text-sm text-gray-600 mb-1">{t.totalVideos}</p>
-                  <p className="text-xl sm:text-2xl font-bold text-black">
-                    {loading ? "..." : stats.totalVideos}
-                  </p>
-                </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center self-end sm:self-auto">
-                  <Video className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t.totalChunks}</p>
-                  <p className="text-2xl font-semibold text-black mt-1">
-                    {loading ? "..." : stats.totalChunks}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Database className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t.storage}</p>
-                  <p className="text-2xl font-semibold text-black mt-1">
-                    {loading ? "..." : stats.storageUsed}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Database className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gray-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">{t.questions}</p>
-                  <p className="text-2xl font-semibold text-black mt-1">
-                    {loading ? "..." : stats.questionsAnswered}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-orange-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="p-4 sm:p-6 lg:p-8 pb-8">
+        {/* Mobile Page Title - Only on mobile since PageHeader is hidden */}
+        <div className="lg:hidden mb-6">
+          <h1 className="text-2xl font-bold text-black">{t.overview}</h1>
+          <p className="text-sm text-gray-600 mt-1">Your video knowledge base</p>
         </div>
 
-        {/* Videos Table */}
-        <Card className="border-gray-200">
-          <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-            <div className="space-y-1.5">
-              <CardTitle className="text-black">{t.recentVideos}</CardTitle>
-              <CardDescription>
-                Monitor your video processing status and progress
-              </CardDescription>
-            </div>
-            <Link href="/pages/new?clear=1">
-              <Button className="bg-black text-white hover:bg-gray-800">
-                <Plus className="w-4 h-4 mr-2" />
-                {t.newVideo}
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent className="p-0 sm:p-6">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="min-w-[200px]">{t.title}</TableHead>
-                    <TableHead className="min-w-[100px]">{t.status}</TableHead>
-                    <TableHead className="hidden sm:table-cell min-w-[120px]">{t.progress}</TableHead>
-                    <TableHead className="hidden md:table-cell">Duration</TableHead>
-                    <TableHead className="hidden lg:table-cell">{t.chunks}</TableHead>
-                    <TableHead className="hidden lg:table-cell">{t.uploaded}</TableHead>
-                    <TableHead className="text-right min-w-[80px]">{t.actions}</TableHead>
-                  </TableRow>
-                </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                      Loading videos...
-                    </TableCell>
-                  </TableRow>
-                ) : error ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-red-500">
-                      <AlertCircle className="w-6 h-6 mx-auto mb-2" />
-                      {error}
-                    </TableCell>
-                  </TableRow>
-                ) : videos.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                      No videos yet. Click "New Video" to get started!
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  videos.map((video) => (
-                    <TableRow key={video.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <Play className="w-4 h-4 text-gray-400" />
-                          <div>
-                            <p className="text-sm font-medium text-black">
-                              {video.title}
-                            </p>
-                            <p className="text-xs text-gray-500">{video.url}</p>
-                          </div>
+        {/* Hero Empty State - Only show when no videos */}
+        {!loading && videos.length === 0 && (
+          <div className="mb-6 sm:mb-8">
+            <Card className="border border-gray-200 bg-gradient-to-br from-gray-50 to-white shadow-sm">
+              <CardContent className="p-8 sm:p-12 text-center">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                    <Video className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  </div>
+
+                  <h2 className="text-xl sm:text-2xl font-bold text-black mb-2">
+                    Welcome to QueryTube
+                  </h2>
+                  <p className="text-sm sm:text-base text-gray-600 mb-6">
+                    Turn any YouTube video into an interactive knowledge base with AI-powered Q&A
+                  </p>
+
+                  <Link href="/pages/new?clear=1">
+                    <Button size="lg" className="bg-black text-white hover:bg-gray-800 active:scale-[0.98] transition-transform w-full sm:w-auto text-base h-12 sm:h-14 px-8">
+                      <Plus className="w-5 h-5 mr-2" />
+                      {t.newVideo}
+                    </Button>
+                  </Link>
+
+                  {/* What Happens Next */}
+                  <div className="mt-7 sm:mt-8 pt-6 sm:pt-7 border-t border-gray-200">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
+                      What Happens Next
+                    </p>
+                    <div className="grid gap-3 sm:gap-4 text-left">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
+                          1
                         </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(video.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Progress value={video.progress} className="w-16 h-2" />
-                          <span className="text-xs text-gray-600">
-                            {video.progress}%
-                          </span>
+                        <div>
+                          <p className="text-sm font-medium text-black">Add Your Video</p>
+                          <p className="text-xs text-gray-600">Paste any YouTube URL</p>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                          <Clock className="w-3 h-3" />
-                          {video.duration}
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
+                          2
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{video.chunks}</Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-600">
-                        {video.uploadedAt}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link href={`/new?videoId=${video.id}`} className="cursor-pointer">
-                                💬 Chat with Video
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/new?videoId=${video.id}`} className="cursor-pointer">
-                                Edit / Configure
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>{t.viewDetails}</DropdownMenuItem>
-                            {video.status === "failed" && (
-                              <DropdownMenuItem>{t.retry}</DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem
-                              className="text-red-600"
-                              onClick={() => handleDeleteVideo(video.id, video.title)}
-                              disabled={deleting === video.id}
-                            >
-                              {deleting === video.id ? "Deleting..." : t.delete}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                        <div>
+                          <p className="text-sm font-medium text-black">AI Processes Content</p>
+                          <p className="text-xs text-gray-600">Automatic transcription & analysis</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
+                          3
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-black">Ask Questions</p>
+                          <p className="text-xs text-gray-600">Get instant, accurate answers</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Trust Signal */}
+                  <div className="mt-6 sm:mt-8 flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-500">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    <span>Powered by GPT-4 & RAG technology</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Quick Stats - Only show when user has videos */}
+        {!loading && videos.length > 0 && (
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
+            <Card className="border-gray-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-gray-600 mb-0.5">Videos Ready</p>
+                    <p className="text-2xl font-bold text-black">
+                      {stats.totalVideos}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Video className="w-5 h-5 text-blue-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-gray-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-gray-600 mb-0.5">Questions Asked</p>
+                    <p className="text-2xl font-bold text-black">
+                      {stats.questionsAnswered}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Videos Section */}
+        {!loading && videos.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-black">{t.recentVideos}</h2>
+                <p className="text-sm text-gray-600">Your knowledge bases</p>
+              </div>
+              <Link href="/pages/new?clear=1">
+                <Button size="sm" className="bg-black text-white hover:bg-gray-800">
+                  <Plus className="w-4 h-4 mr-1" />
+                  <span className="hidden sm:inline">New</span>
+                </Button>
+              </Link>
             </div>
 
-            {videos.length > 0 && (
-              <div className="mt-4 flex justify-center">
+            <div className="space-y-3">
+              {videos.slice(0, 5).map((video) => (
+                <Card key={video.id} className="border-gray-200 hover:border-gray-300 transition-colors">
+                  <CardContent className="p-4">
+                    <div className="flex gap-3">
+                      {/* Thumbnail */}
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                        {video.youtubeId ? (
+                          <img
+                            src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`}
+                            alt={video.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Video className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="font-medium text-black text-sm line-clamp-2">
+                            {video.title}
+                          </h3>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="flex-shrink-0 h-8 w-8">
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/new?videoId=${video.id}`} className="cursor-pointer">
+                                  💬 Chat with Video
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link href={`/new?videoId=${video.id}`} className="cursor-pointer">
+                                  Edit / Configure
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>{t.viewDetails}</DropdownMenuItem>
+                              {video.status === "failed" && (
+                                <DropdownMenuItem>{t.retry}</DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onClick={() => handleDeleteVideo(video.id, video.title)}
+                                disabled={deleting === video.id}
+                              >
+                                {deleting === video.id ? "Deleting..." : t.delete}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          {getStatusBadge(video.status)}
+                          <div className="flex items-center gap-1 text-xs text-gray-600">
+                            <Clock className="w-3 h-3" />
+                            {video.duration}
+                          </div>
+                          {video.chunks > 0 && (
+                            <Badge variant="outline" className="text-xs">
+                              {video.chunks} chunks
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Progress Bar (only show if processing) */}
+                        {video.status === "processing" && video.progress < 100 && (
+                          <div className="mt-2">
+                            <div className="flex items-center gap-2">
+                              <Progress value={video.progress} className="flex-1 h-1.5" />
+                              <span className="text-xs text-gray-600 font-medium">
+                                {video.progress}%
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Primary Action Button */}
+                        {video.status === "completed" && (
+                          <Link href={`/new?videoId=${video.id}`}>
+                            <Button size="sm" variant="outline" className="mt-2 w-full sm:w-auto text-xs h-8">
+                              Start Chat →
+                            </Button>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {videos.length > 5 && (
+              <div className="mt-4 text-center">
                 <Link href="/pages/videos">
-                  <Button variant="outline">{t.allVideos} →</Button>
+                  <Button variant="outline" className="w-full sm:w-auto">
+                    View All {videos.length} Videos →
+                  </Button>
                 </Link>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-gray-400" />
+            <p className="text-sm text-gray-600">Loading your knowledge bases...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-6 text-center">
+              <AlertCircle className="w-8 h-8 mx-auto mb-3 text-red-600" />
+              <p className="text-sm text-red-600 font-medium mb-1">Unable to load dashboard</p>
+              <p className="text-xs text-red-500">{error}</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}

@@ -10,20 +10,21 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
+  id            String  @id @default(uuid())
+  email         String  @unique
   name          String?
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean @default(false)
   image         String?
 
   // Timestamps
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  videos        Video[]
-  sessions      Session[]
-  accounts      Account[]
+  videos   Video[]
+  sessions Session[]
+  accounts Account[]
+  drafts   Draft[]
 
   @@index([email])
 }
@@ -49,15 +50,15 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(uuid())
-  token        String   @unique
-  userId       String
-  expiresAt    DateTime
-  ipAddress    String?
-  userAgent    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([token])
@@ -83,41 +84,41 @@ model verification {
 }
 
 model Video {
-  id                String   @id @default(uuid())
-  userId            String   // Owner of this video
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  userId String // Owner of this video
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   youtubeUrl        String?
-  youtubeId         String?  @unique
+  youtubeId         String? @unique
   title             String
   description       String?
   duration          Int // in seconds
   durationFormatted String
   thumbnail         String?
   uploader          String?
-  language          String   @default("en")
+  language          String  @default("en")
 
   // Processing status
-  status            String   @default("pending") // pending, processing, completed, failed
-  errorMessage      String?
+  status       String  @default("pending") // pending, processing, completed, failed
+  errorMessage String?
 
   // Transcript source
-  transcriptSource  String?  // youtube-captions, whisper-api, uploaded-file
-  transcript        String?  // Full transcript text
-  summary           String?  // AI-generated summary of video content
+  transcriptSource String? // youtube-captions, whisper-api, uploaded-file
+  transcript       String? // Full transcript text
+  summary          String? // AI-generated summary of video content
 
   // File info
-  audioFilePath     String?
-  audioFileSize     Int?     // in bytes
+  audioFilePath String?
+  audioFileSize Int? // in bytes
 
   // Timestamps
-  uploadedAt        DateTime @default(now())
-  processedAt       DateTime?
+  uploadedAt  DateTime  @default(now())
+  processedAt DateTime?
 
   // Relations
-  chunks            Chunk[]
-  macroChunks       MacroChunk[]
-  analytics         Analytics[]
+  chunks      Chunk[]
+  macroChunks MacroChunk[]
+  analytics   Analytics[]
 
   @@index([status])
   @@index([youtubeId])
@@ -125,73 +126,114 @@ model Video {
 }
 
 model Chunk {
-  id          String   @id @default(uuid())
-  videoId     String
-  video       Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  id      String @id @default(uuid())
+  videoId String
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
-  chunkIndex  Int
-  text        String
-  startTime   Int      // in seconds
-  endTime     Int      // in seconds
-  timestamp   String   // formatted timestamp (e.g., "00:12:34")
+  chunkIndex Int
+  text       String
+  startTime  Int // in seconds
+  endTime    Int // in seconds
+  timestamp  String // formatted timestamp (e.g., "00:12:34")
 
   // NOTE: Chunks are small segments (1-6s) for timestamp precision
   // Legacy: vectorId kept for backward compatibility - prefer MacroChunk for new embeddings
-  vectorId           String?  @unique  // Pinecone vector ID (legacy)
-  embeddingProvider  String?  // mistral, openai (legacy)
+  vectorId          String? @unique // Pinecone vector ID (legacy)
+  embeddingProvider String? // mistral, openai (legacy)
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
+  @@unique([videoId, chunkIndex])
   @@index([videoId])
   @@index([vectorId])
-  @@unique([videoId, chunkIndex])
 }
 
 model MacroChunk {
-  id                  String   @id @default(uuid())
-  videoId             String
-  video               Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  id      String @id @default(uuid())
+  videoId String
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
-  chunkIndex          Int      // index of this macro chunk
-  text                String   // combined text from multiple segments
-  startTime           Int      // in seconds
-  endTime             Int      // in seconds
-  timestamp           String   // formatted start timestamp
+  chunkIndex Int // index of this macro chunk
+  text       String // combined text from multiple segments
+  startTime  Int // in seconds
+  endTime    Int // in seconds
+  timestamp  String // formatted start timestamp
 
   // References to original segments
-  segmentStartIndex   Int      // first segment index in this chunk
-  segmentEndIndex     Int      // last segment index in this chunk
+  segmentStartIndex Int // first segment index in this chunk
+  segmentEndIndex   Int // last segment index in this chunk
 
   // Vector database references
-  vectorId            String?  @unique  // Pinecone vector ID
-  embeddingProvider   String?  // mistral, openai
+  vectorId          String? @unique // Pinecone vector ID
+  embeddingProvider String? // mistral, openai
 
-  createdAt           DateTime @default(now())
+  createdAt DateTime @default(now())
 
+  @@unique([videoId, chunkIndex])
   @@index([videoId])
   @@index([vectorId])
-  @@unique([videoId, chunkIndex])
 }
 
 model Analytics {
-  id           String   @id @default(uuid())
-  videoId      String
-  video        Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  id      String @id @default(uuid())
+  videoId String
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
   question     String
   answer       String
-  responseTime Float    // in seconds
+  responseTime Float // in seconds
 
   // AI provider tracking
-  provider     String   // groq, openai, claude - which provider handled the Q&A
-  model        String   // llama-3.3-70b-versatile, gpt-4o-mini, etc.
+  provider String // groq, openai, claude - which provider handled the Q&A
+  model    String // llama-3.3-70b-versatile, gpt-4o-mini, etc.
 
   // Retrieved chunks info
-  chunksUsed   Int      @default(0)
+  chunksUsed Int @default(0)
 
-  timestamp    DateTime @default(now())
+  timestamp DateTime @default(now())
 
   @@index([videoId])
   @@index([timestamp])
   @@index([provider])
+}
+
+// Knowledge Base Draft Sessions
+// Replaces localStorage-based session management
+model Draft {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Video information
+  youtubeUrl  String?
+  title       String?
+  thumbnail   String?
+  duration    Int? // in seconds
+  youtubeId   String?
+  uploader    String?
+  description String?
+
+  // Processing state
+  currentStep      String  @default("upload") // upload, process, knowledge, configure, deploy
+  status           String  @default("draft") // draft, completed, abandoned
+  processingStatus String? // idle, processing, processed, error
+
+  // Transcript data (JSON)
+  transcriptData   Json? // Stores transcript chunks
+  transcriptSource String? // youtube-captions, whisper-api
+
+  // Linked video (when completed)
+  videoId String? @unique
+
+  // Error handling
+  errorMessage String?
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  lastAccessedAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([status])
+  @@index([lastAccessedAt])
 }
