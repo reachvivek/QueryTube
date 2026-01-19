@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { YoutubeTranscript } from "youtube-transcript";
+import { getSubtitles } from "youtube-caption-extractor";
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,16 +37,13 @@ export async function POST(request: NextRequest) {
     let transcript;
 
     try {
-      // youtube-transcript library handles language fallback automatically
-      // It will try the requested language and fall back to available ones
-      transcript = await YoutubeTranscript.fetchTranscript(videoId, {
-        lang: requestedLang,
-      });
+      // youtube-caption-extractor uses modern Innertube API
+      transcript = await getSubtitles({ videoID: videoId, lang: requestedLang });
     } catch (error: any) {
-      // If specific language fails, try without language constraint
+      // If specific language fails, try English as fallback
       try {
-        transcript = await YoutubeTranscript.fetchTranscript(videoId);
-        actualLang = "auto"; // Language was auto-detected
+        transcript = await getSubtitles({ videoID: videoId, lang: "en" });
+        actualLang = "en"; // Language was auto-detected
       } catch (fallbackError: any) {
         return NextResponse.json(
           {
@@ -75,11 +72,11 @@ export async function POST(request: NextRequest) {
     // Convert transcript to our format
     const fullTranscript = transcript.map((item: any) => item.text).join(" ");
 
-    // Create chunks with timestamps
+    // Create chunks with timestamps (youtube-caption-extractor uses 'start' and 'dur' in seconds)
     const chunks = transcript.map((item: any, index: number) => ({
       text: item.text,
-      startTime: Math.floor(item.offset / 1000), // Convert ms to seconds
-      endTime: Math.floor((item.offset + item.duration) / 1000),
+      startTime: Math.floor(Number(item.start || 0)),
+      endTime: Math.floor(Number(item.start || 0) + Number(item.dur || 0)),
       chunkIndex: index,
     }));
 
